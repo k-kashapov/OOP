@@ -1,9 +1,8 @@
 #include "word.h"
 
-struct dict_t
-{
-	struct word *arr;
-	size_t       len;
+struct dict_t {
+    struct word *arr;
+    size_t len;
 };
 
 int dict_add(struct dict_t *dict, struct word_t *word);
