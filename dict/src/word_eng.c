@@ -1,13 +1,26 @@
 #include "word_eng.h"
+#include <string.h>
+#include <ctype.h>
 
-struct word_t *word_eng_alloc(size_t len)
+int word_eng_parse(char *str, struct word_t *dest)
 {
-    return word_std_alloc(len);
-}
+    char *str_p = str;
 
-struct word_t *word_eng_parse(char *str, struct word_t *word)
-{
-    return word;
+    while(isalpha(*str_p++)) ;
+    if (str_p <= str) return -1;
+
+    char *text = (char *)malloc(str_p - str);
+    if (text == NULL) 
+    {
+        return -1;
+    }
+    
+    dest->len  = str_p - str;
+    
+    strncpy(text, str, dest->len);
+    dest->text = text;
+
+    return dest->len;
 }
 
 void word_eng_free(struct word_t *word)
