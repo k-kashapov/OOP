@@ -5,8 +5,8 @@
 #define INIT_LEN 100
 
 int dict_init(struct dict_t *dict) {
-    dict->arr = (struct word *)calloc(INIT_LEN, sizeof(struct word_t));
     dict->len = 0;
+    dict->arr = (struct word *)calloc(INIT_LEN, sizeof(struct word_t));
 
     return dict->arr == NULL;
 }
