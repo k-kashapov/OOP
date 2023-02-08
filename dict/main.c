@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include "dict.h"
 #include "word_eng.h"
+#include <stdio.h>
 
 int main(int argc, const char **argv) {
     (void)argc;
@@ -15,7 +15,8 @@ int main(int argc, const char **argv) {
         return dict_err;
     }
 
-    dict_read(&dict, "JOJO JOJO JOJO", &meth);
+    dict_read(&dict, "JOJO JOJO JOJO DIO DIO JOJO DIO", &meth);
+    dict_print(&dict);
 
     dict_free(&dict);
 
