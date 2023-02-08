@@ -7,6 +7,7 @@ struct word_t {
     char                *text;
     int                  len;
     int                  count;
+    int                  line;
     struct word_methods *methods;
 };
 

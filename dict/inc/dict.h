@@ -6,6 +6,7 @@
 struct dict_t {
     struct word_t *arr;
     size_t len;
+    size_t cap;
 };
 
 int  dict_init (struct dict_t *dict);

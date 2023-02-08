@@ -15,7 +15,7 @@ int main(int argc, const char **argv) {
         return dict_err;
     }
 
-    dict_read(&dict, "JOJO JOJO JOJO DIO DIO JOJO DIO", &meth);
+    dict_read(&dict, "JOJO JOJO JOJO DIO DIO JOJO DIO a b e a b r t e d o", &meth);
     dict_print(&dict);
 
     dict_free(&dict);
