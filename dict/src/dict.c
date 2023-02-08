@@ -1,18 +1,16 @@
-#include "dict.h"
 #include <stdio.h>
 #include <string.h>
+#include "dict.h"
+#include "list.h"
 
-#define INIT_CAP 2
+#define DICT_CAP 20
 
 #define DICT_AT(idx) (dict->arr[idx])
-#define TEXT_AT(idx) (DICT_AT(idx).text)
 #define LEN_AT(idx) (DICT_AT(idx).len)
-#define COUNT_AT(idx) (DICT_AT(idx).count)
 
 int dict_init(struct dict_t *dict) {
-    dict->len = 0;
     dict->cap = INIT_CAP;
-    dict->arr = (struct word_t *)calloc(INIT_CAP, sizeof(struct word_t));
+    dict->arr = (struct list_t *)calloc(INIT_CAP, sizeof(struct list_t));
 
     return dict->arr == NULL;
 }
@@ -50,54 +48,21 @@ int dict_read(struct dict_t *dict, char *str, struct word_methods *meth) {
     return added;
 }
 
-int dict_add(struct dict_t *dict, struct word_t *word) {
-    printf("Adding word: |%.*s| of len (%d)\n", word->len, word->text,
-           word->len);
-
-    for (size_t i = 0; i < dict->len; i++) {
-        if (!strncmp(TEXT_AT(i), word->text, word->len)) {
-            printf("found word |%.*s| at (%ld)\n", word->len, word->text, i);
-
-            COUNT_AT(i)++;
-            word->methods->word_free(word);
-
-            return 0;
-        }
-    }
-
-    DICT_AT(dict->len) = *word;
-    dict->len++;
-
-    if (dict->len >= dict->cap - 1) {
-        printf("resizing from cap = (%ld) to cap = (%ld)\n", dict->cap, dict->cap * 2);
-
-        void *tmp = realloc(dict->arr, dict->cap * 2 * sizeof(struct word_t));
-        if (tmp == NULL) {
-            fprintf(stderr,
-                    "ERROR: Could not resize dictionary to (%ld) bytes.\n",
-                    dict->cap * 2 * sizeof(struct word_t));
-            return -1;
-        }
-        dict->arr = tmp;
-        dict->cap *= 2;
-    }
+int dict_add(struct dict_t *dict, struct word_t *word)
+{
+    
 
     return 0;
 }
 
 void dict_print(struct dict_t *dict) {
-    for (size_t i = 0; i < dict->len; i++) {
-        printf("dict[%ld] = |%.*s| seen (%d) times\n", i, dict->arr[i].len,
-               TEXT_AT(i), COUNT_AT(i));
-    }
-
     return;
 }
 
 void dict_free(struct dict_t *dict) {
-    for (size_t i = 0; i < dict->len; i++) {
-        fprintf(stderr, "freeing arr[%ld]\n", i);
-        DICT_AT(i).methods->word_free(&dict->arr[i]);
+    for(size_t list = 0; list < dict->len)
+    {
+        list_free(dict->arr[list]);
     }
 
     free(dict->arr);

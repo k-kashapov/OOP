@@ -4,8 +4,7 @@
 #include "word.h"
 
 struct dict_t {
-    struct word_t *arr;
-    size_t len;
+    struct list_t *arr;
     size_t cap;
 };
 
