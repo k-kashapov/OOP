@@ -4,13 +4,10 @@ CXX = g++
 CXXFLAGS = -I inc -Wall -Wextra
 DBGFLAGS = -fsanitize=address -ggdb3
 
-SRCS = main.cpp
+SRCS = main.cpp src/*.cpp
 OBJS = $(SRCS:.cpp=.o)
 
-depend: $(SRCS)
-	$(CXX) -MM $(SRCS) -o depends
-
-all: main.o
+all: $(SRCS)
 	 $(CXX) $^ $(CXXFLAGS) -o main.elf -O2
 
 elf: all
@@ -25,6 +22,9 @@ release: $(SRCS)
 	$(CXX) $^ $(CXXFLAGS) -o main_release.elf -O2 -s
 
 -include depends
+
+depend: $(SRCS)
+	$(CXX) -MM $(SRCS) -o depends
 
 clean:
 	- rm -rf main.elf
