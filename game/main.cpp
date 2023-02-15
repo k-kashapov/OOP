@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <stdio.h>
 #include <iostream>
 #include "view.h"
 
@@ -13,12 +13,9 @@ int main(int argc, const char **argv)
             v = View::get(TEXT_TYPE);
         }
 
-        v->draw();
-
-        // printf("drawing end\n");
-
         while (1) {
-            putchar(getchar());
+            v->clear();
+            v->draw();
         }
 
         delete v;

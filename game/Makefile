@@ -8,7 +8,7 @@ SRCS = main.cpp src/*.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(SRCS)
-	 $(CXX) $^ $(CXXFLAGS) -o main.elf -O2
+	 $(CXX) $^ $(CXXFLAGS) -o main.elf -O0
 
 elf: all
 
@@ -27,5 +27,4 @@ depend: $(SRCS)
 	$(CXX) -MM $(SRCS) -o depends
 
 clean:
-	- rm -rf main.elf
 	- rm -rf *.o *.elf

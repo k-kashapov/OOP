@@ -6,6 +6,7 @@
 class GUIView : public View {
 public:
     void draw(void);
+    void clear(void);
     int  WinXY(void);
 
     GUIView(void) {}

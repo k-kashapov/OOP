@@ -10,6 +10,7 @@ class View {
 public:
     int _x, _y;
     virtual void draw (void) = 0;
+    virtual void clear(void) = 0;
     virtual int  WinXY(void) = 0;
     
     View(void){}

@@ -5,9 +5,6 @@
 
 class TextView : public View {
 public:
-    void draw(void);
-    int  WinXY(void);
-
     TextView(void);
 
     TextView(int x, int y):
@@ -16,6 +13,13 @@ public:
 
     ~TextView()
     {}
+
+    void draw(void);
+    void clear(void);
+    int  WinXY(void);
+    void setCaret(int x, int y);
+    void vline(int x, int y, int len);
+    void hline(int x, int y, int len);
 };
 
 #endif // TEXTVIEW_H

@@ -9,3 +9,7 @@ int GUIView::WinXY(void) {
 void GUIView::draw(void) {
     std::cout << "GUIView(" << _x << ", " << _y << ") draw called\n";
 }
+
+void GUIView::clear(void) {
+    std::cout << "GUIView(" << _x << ", " << _y << ") clear called\n";
+}

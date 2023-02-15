@@ -8,13 +8,14 @@ void win_hdlr(int param) {
     (void) param;
 
     View *curr = View::get();
-
-    curr->WinXY();
     
-    fprintf(stderr, 
-            "Window size changed!\n"
-            "New (x, y) = (%d, %d)\n", 
-            curr->_x, curr->_y);
+    curr->WinXY();
+    curr->clear();
+
+    // fprintf(stderr, 
+    //         "Window size changed!\n"
+    //         "New (x, y) = (%d, %d)\n", 
+    //         curr->_x, curr->_y);
 }
 
 TextView::TextView(void) {
@@ -44,18 +45,40 @@ int TextView::WinXY(void) {
     return 0;
 }
 
-void TextView::draw(void) {
-    printf("Drawing window of size (%d, %d)\n", _x, _y);
+void TextView::setCaret(int x, int y) {
+    printf("\e[%d;%dH", y + 1, x + 1);
+}
 
-    for (int y = 0; y < _y; y++) {
-        // putchar('#');
-        printf("%d", y / 10);
-        
-        for (int x = 1; x < _x - 1; x++) {
-            putchar('.');
-        }
-
-        // putchar('#');
-        printf("%d", y % 10);
+void TextView::vline(int x, int y, int len) {
+    for (int i = 0; i <= len; i++) {
+        setCaret(x, y + i);
+        putchar('$');
     }
+}
+
+void TextView::hline(int x, int y, int len) {
+    setCaret(x, y);
+    for (int i = 0; i <= len; i++) {
+        putchar('$');
+    }
+}
+
+void TextView::draw(void) {
+    clear();
+
+    vline(0,  0, _y);
+    vline(_x, 0, _y);
+
+    hline(0,  0, _x - 1);
+    hline(0, _y, _x - 1);
+
+    // setCaret(_x / 2 - 15, _y / 2);
+    // printf("Drawing window of size (%d, %d)\n", _x, _y);
+
+    fflush(stdout);
+    pause();
+}
+
+void TextView::clear(void) {
+    printf("\e[H\e[J");
 }
