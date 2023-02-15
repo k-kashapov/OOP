@@ -100,7 +100,8 @@ TextView()::draw() {
 class GUIView() : View()
 
 ```
-Factory
+### Factory
+
 ```
 class View {
     static View *get();
@@ -116,3 +117,61 @@ static View *get(what) {
 }
 
 ```
+
+```
+TUI:
+    public:
+        virtual draw();
+        ... drawRabbit();
+    private:
+        rabbit_model;
+```
+
+```
+           x --->
+  /-------------------\
+  |                   |
+y |  ###              |
+| |    #              |
+| |    ####>    r     |
+V |                   |
+  |score:             |
+  \-------------------/
+```
+
+1) WinSize
+2) PutXY
+3) hline, vline, line
+4) cls
+
+tty uses line discipline. We can ask it to get terminal width and height.
+
+`ioctl (fd, cmd, param, ...)`
+
+cmd = TIOCGWINSZ -> `struct WinSize { x, y }`;
+
+add `WinSz()` to `View`.
+
+SIGWINCH
+
+CSI = Command Sequence Initiatior
+`\e[13;5;1command`
+
+```
+cls:
+    \e[H // Home
+    \e[J // Clear
+```
+
+```
+goto x,y:
+    \e[yy;xxH
+```
+
+```
+color (foreg, bkg):
+    \e[ff;bbm    // ff: 30, 31...; bb: 40, 41, ...
+    \e[aa;ff;bbm // attributes; foreground; background
+```
+
+

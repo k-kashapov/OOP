@@ -5,12 +5,11 @@ int main(int argc, const char **argv)
 {
     View *v;
 
-    if(argc > 1)
-    {
+    if(argc > 1) {
         if (std::string(argv[1]) == "GUI") {
-            v = View::get(500, 60, 2);
+            v = View::get(GUI_TYPE);
         } else {
-            v = View::get(10, 100, 1);
+            v = View::get(TEXT_TYPE);
         }
 
         v->draw();
