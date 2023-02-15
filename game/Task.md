@@ -152,7 +152,7 @@ cmd = TIOCGWINSZ -> `struct WinSize { x, y }`;
 
 add `WinSz()` to `View`.
 
-SIGWINCH
+#### SIGWINCH - signal that window size changed
 
 CSI = Command Sequence Initiatior
 `\e[13;5;1command`

@@ -5,8 +5,8 @@
 
 class GUIView : public View {
 public:
-    void   draw(void);
-    pair_t WinXY(void);
+    void draw(void);
+    int  WinXY(void);
 
     GUIView(void) {}
 

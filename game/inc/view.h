@@ -1,7 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "window.h"
+#include <sys/ioctl.h>
 
 #define GUI_TYPE  2
 #define TEXT_TYPE 1
@@ -9,8 +9,8 @@
 class View {
 public:
     int _x, _y;
-    virtual void   draw(void)  = 0;
-    virtual pair_t WinXY(void) = 0;
+    virtual void draw (void) = 0;
+    virtual int  WinXY(void) = 0;
     
     View(void){}
 

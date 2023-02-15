@@ -1,11 +1,11 @@
 #include <iostream>
 #include "GUIView.h"
-#include "window.h"
 
-pair_t GUIView::WinXY(void) {
-    return pair_t { 100, 100 };
+int GUIView::WinXY(void) {
+    _x = _y = 0;
+    return 0;
 }
 
 void GUIView::draw(void) {
-    std::cout << "GUI draw not implemented\n";
+    std::cout << "GUIView(" << _x << ", " << _y << ") draw called\n";
 }

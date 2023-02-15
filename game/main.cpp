@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 #include "view.h"
 
@@ -13,6 +14,12 @@ int main(int argc, const char **argv)
         }
 
         v->draw();
+
+        // printf("drawing end\n");
+
+        while (1) {
+            putchar(getchar());
+        }
 
         delete v;
     }
