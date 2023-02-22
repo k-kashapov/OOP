@@ -117,6 +117,7 @@ static View *get(what) {
 }
 
 ```
+## Sem 2
 
 ```
 TUI:
@@ -173,5 +174,64 @@ color (foreg, bkg):
     \e[ff;bbm    // ff: 30, 31...; bb: 40, 41, ...
     \e[aa;ff;bbm // attributes; foreground; background
 ```
+## Sem 3
 
+```
+Model = DataBase {
+    void Update(); // Called every ~ 1 second
+}
+```
 
+```
+main:
+    model = Model();
+    v->setModel(&model);
+    v->draw();  // ==> model->Update()
+
+view:
+    setModel(Model *model);
+    
+    draw() {
+        while(1) {
+            model->Update();
+            sleep(1);
+        }
+    }
+```
+
+#### Templates
+
+```
+template T;
+T a[5];
+
+class X;
+X<int> Q; // no idea
+```
+#### Containers
+```
+C:
+    int a[3]:
+        a[x]
+        *a
+        a++
+        a--
+
+    struct a:
+        a->x
+
+STL: // standard template library
+    vector // v[4]
+    list   // l[4]
+    map    // m["key"]
+    set    // map but it says if present or not
+
+namespace my_namespace {
+    class a;
+    class b;
+}
+
+std::vector aaa();
+
+using namespace std;
+```
