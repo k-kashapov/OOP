@@ -65,15 +65,14 @@ void TextView::hline(int x, int y, int len) {
 
 void TextView::draw(void) {
     clear();
-
     vline(0,  0, _y);
     vline(_x, 0, _y);
 
     hline(0,  0, _x - 1);
-    hline(0, _y, _x - 1);
+    hline(0, _y, _x - 2);
 
-    // setCaret(_x / 2 - 15, _y / 2);
-    // printf("Drawing window of size (%d, %d)\n", _x, _y);
+    setCaret(_x / 2 - 15, _y / 2);
+    printf("Drawing window of size (%d, %d)\n", _x, _y);
 
     fflush(stdout);
     pause();

@@ -3,8 +3,10 @@
 
 #include <sys/ioctl.h>
 
-#define GUI_TYPE  2
-#define TEXT_TYPE 1
+enum VIEW_TYPE {
+    TEXT_TYPE = 1,
+    GUI_TYPE  = 2,
+};
 
 class View {
 public:
