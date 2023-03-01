@@ -10,6 +10,10 @@ public:
     int  WinXY   (void)         override;
     void setModel(Model* model) override;
 
+    int  getKey() override { 
+        return -1;
+    }
+
     GUIView(void) {}
 
     GUIView(int x, int y):

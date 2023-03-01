@@ -1,6 +1,7 @@
-#include <stdio.h>
+#include <iostream>
 #include <signal.h>
-#include <unistd.h>
+#include <termios.h>
+#include <poll.h>
 #include "TextView.h"
 #include "view.h"
 
@@ -11,14 +12,11 @@ static void win_hdlr(int param) {
     
     curr->WinXY();
     curr->clear();
-
-    // fprintf(stderr, 
-    //         "Window size changed!\n"
-    //         "New (x, y) = (%d, %d)\n", 
-    //         curr->_x, curr->_y);
 }
 
-TextView::TextView(void) {
+static termios old;
+
+TextView::TextView() {
     int xy_err = WinXY();
     if (xy_err) {
         fprintf(stderr, "Could not get xy!\n");
@@ -28,9 +26,26 @@ TextView::TextView(void) {
     act.sa_handler = win_hdlr;
 
     sigaction(SIGWINCH, &act, NULL);
+
+    if (tcgetattr(STDIN_FILENO, &old)) {
+        std::cerr << "Could not get stdin attributes!\n" << std::endl;
+    }
+
+    termios term = old;
+    cfmakeraw(&term);
+    
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &term)) {
+        std::cerr << "Could not set stdin attributes to raw!\n" << std::endl;
+    }
 }
 
-int TextView::WinXY(void) {
+TextView::~TextView() {
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &old)) {
+        std::cerr << "Could not reset stdin attributes to normal!\n" << std::endl;
+    }
+}
+
+int TextView::WinXY() {
     struct winsize size;
    
     int io_err = ioctl(STDIN_FILENO, TIOCGWINSZ, &size);
@@ -85,10 +100,12 @@ void TextView::draw(void) {
         putchar('#');
     }
 
-    for (coord &curr : _model->snake) {
+    for (coord &curr : _model->snake.body) {
         setCaret(curr.first, curr.second);
         putchar('S');
     }
+
+    setCaret(_x, _y);
 
     fflush(stdout);
     sleep(1);
@@ -96,4 +113,21 @@ void TextView::draw(void) {
 
 void TextView::clear(void) {
     printf("\e[H\e[J");
+}
+
+int TextView::getKey() {
+    int key_buff[128];
+
+    pollfd fd = {.fd = STDIN_FILENO, .events = POLLIN, .revents = 0};
+    int res = poll(&fd, 1, 100);
+    if (res < 0) {
+        std::cerr << "Polling keyboard error!\n" << std::endl;
+    } else {
+        if (fd.revents & POLLIN) {
+            read(STDIN_FILENO, key_buff, 128);
+            return key_buff[0];
+        }
+    }
+
+    return -1;
 }

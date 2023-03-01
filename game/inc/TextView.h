@@ -5,23 +5,24 @@
 
 class TextView : public View {
 public:
-    TextView(void);
+    TextView();
 
     TextView(int x, int y):
         View(x, y)
     {}
 
-    ~TextView()
-    {}
+    ~TextView();
 
     void draw    (void)         override;
     void clear   (void)         override;
     int  WinXY   (void)         override;
     void setModel(Model* model) override;
+    int  getKey  ()             override;
     
     void setCaret(int x, int y);
     void vline(int x, int y, int len);
     void hline(int x, int y, int len);
+
 };
 
 #endif // TEXTVIEW_H

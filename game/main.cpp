@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <iostream>
 #include "view.h"
+#include "HumanController.h"
 
-int main(int argc, const char **argv)
-{
+int main(int argc, const char **argv) {
     View *v;
 
     if(argc > 1) {
@@ -13,11 +13,18 @@ int main(int argc, const char **argv)
             v = View::get(TEXT_TYPE);
         }
 
+        SnakeController c{};
         Model m{};
 
+        c.setSnake(&m.snake);
         v->setModel(&m);
 
         while (1) {
+            int key = v->getKey();
+            if (key > 0) {
+                v->callOnKey(key);
+            }
+
             v->draw();
         }
 

@@ -321,3 +321,18 @@ Arrow keys:
 \e[C ->
 \e[D <-
 ```
+
+```
+model->setController(c);
+model:
+    setController(c) {
+        c->onKey('A', move_left());
+    }
+```
+
+May need `std::function` and `std::bind`
+
+```
+s->f(i) // we want to be able to call it with f(i)
+f = std::bind(s::f, s, _1)
+```

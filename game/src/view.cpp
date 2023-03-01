@@ -23,3 +23,13 @@ View *View::get(int what) {
             return View::_curr;
     }
 }
+
+void View::setOnKey(std::function<void (int)> func) {
+    onKeySubs.push_back(func);
+}
+
+void View::callOnKey(int key) {
+    for (auto& func : onKeySubs) {
+        func(key);
+    }
+}

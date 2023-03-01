@@ -8,7 +8,7 @@ SRCS = main.cpp src/*.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(SRCS)
-	 $(CXX) $^ $(CXXFLAGS) -o main.elf -O0
+	 $(CXX) $^ $(CXXFLAGS) -o main.elf
 
 elf: all
 

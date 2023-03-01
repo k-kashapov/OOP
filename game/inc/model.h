@@ -1,3 +1,6 @@
+#ifndef MODEL_H
+#define MODEL_H
+
 #include <utility>
 #include <list>
 #include <cstdlib>
@@ -5,13 +8,30 @@
 
 using coord = std::pair<int, int>;
 
+enum DIRECTIONS {
+    UP    = 0,
+    DOWN  = 1,
+    LEFT  = 2,
+    RIGHT = 3,
+};
+
+class Snake {
+public:
+    std::list<coord> body;
+    DIRECTIONS dir;
+    void onKey(int key);
+};
+
 class Model {
 public:
     std::list<coord> rabbits;
-    std::list<coord> snake;
+    
+    Snake snake;
     
     Model();
     ~Model() {};
     
     void Update();
 };
+
+#endif // MODEL_H

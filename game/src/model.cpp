@@ -1,19 +1,15 @@
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include "model.h"
-
-enum DIRECTIONS {
-    UP    = 0,
-    DOWN  = 1,
-    LEFT  = 2,
-    RIGHT = 3,
-};
 
 Model::Model() {
     std::srand(std::time(NULL));
 
+    snake.dir = RIGHT;
+
     for (int i = 0; i < 7; i++) {
-        snake.push_back(coord{5, 5});
+        snake.body.push_back(coord{5, 5});
     }
 
     for (int i = 0; i < 7; i++) {
@@ -21,33 +17,37 @@ Model::Model() {
     }
 }
 
+static void moveCoord(coord &tgt, int dir, int len = 1) {
+    switch (dir) {
+        case RIGHT:
+            tgt.first += len;
+            break;
+        case LEFT:
+            tgt.first -= len;
+            break;
+        case DOWN:
+            tgt.second += len;
+            break;
+        case UP:
+            tgt.second -= len;
+            break;
+        default:
+            std::cerr << "Unexpected direction: " << dir << std::endl;
+            break;
+    }
+}
+
 void Model::Update() {
-    snake.pop_back();
+    snake.body.pop_back();
 
-    coord new_head = snake.front();
-    new_head.first += 1;
+    coord new_head = snake.body.front();
+    moveCoord(new_head, snake.dir);
 
-    snake.push_front(new_head);
+    snake.body.push_front(new_head);
 
     for (auto &rabbit : rabbits){
         int dir = rand() % 4;
-        switch (dir) {
-            case RIGHT:
-                rabbit.first += 1;
-                break;
-            case LEFT:
-                rabbit.first -= 1;
-                break;
-            case DOWN:
-                rabbit.second += 1;
-                break;
-            case UP:
-                rabbit.second -= 1;
-                break;
-            default:
-                std::cout << "Unexpected direction: %d\n" << std::endl;
-                break;
-        }
+        moveCoord(rabbit, dir);
     }
 
     return;
