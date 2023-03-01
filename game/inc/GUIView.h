@@ -5,9 +5,10 @@
 
 class GUIView : public View {
 public:
-    void draw(void);
-    void clear(void);
-    int  WinXY(void);
+    void draw    (void)         override;
+    void clear   (void)         override;
+    int  WinXY   (void)         override;
+    void setModel(Model* model) override;
 
     GUIView(void) {}
 

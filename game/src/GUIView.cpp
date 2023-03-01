@@ -6,6 +6,11 @@ int GUIView::WinXY(void) {
     return 0;
 }
 
+void GUIView::setModel(Model *model) {
+    (void) model;
+    std::cout << "GUIView(" << _x << ", " << _y << ") set Model called\n";
+}
+
 void GUIView::draw(void) {
     std::cout << "GUIView(" << _x << ", " << _y << ") draw called\n";
 }

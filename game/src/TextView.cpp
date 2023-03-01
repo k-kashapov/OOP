@@ -4,7 +4,7 @@
 #include "TextView.h"
 #include "view.h"
 
-void win_hdlr(int param) {
+static void win_hdlr(int param) {
     (void) param;
 
     View *curr = View::get();
@@ -52,15 +52,19 @@ void TextView::setCaret(int x, int y) {
 void TextView::vline(int x, int y, int len) {
     for (int i = 0; i <= len; i++) {
         setCaret(x, y + i);
-        putchar('$');
+        putchar('|');
     }
 }
 
 void TextView::hline(int x, int y, int len) {
     setCaret(x, y);
     for (int i = 0; i <= len; i++) {
-        putchar('$');
+        putchar('-');
     }
+}
+
+void TextView::setModel(Model* model) {
+    _model = model;
 }
 
 void TextView::draw(void) {
@@ -74,8 +78,20 @@ void TextView::draw(void) {
     setCaret(_x / 2 - 15, _y / 2);
     printf("Drawing window of size (%d, %d)\n", _x, _y);
 
+    _model->Update();
+    
+    for (coord &curr : _model->rabbits) {
+        setCaret(curr.first, curr.second);
+        putchar('#');
+    }
+
+    for (coord &curr : _model->snake) {
+        setCaret(curr.first, curr.second);
+        putchar('S');
+    }
+
     fflush(stdout);
-    pause();
+    sleep(1);
 }
 
 void TextView::clear(void) {

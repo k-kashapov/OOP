@@ -2,6 +2,7 @@
 #define VIEW_H
 
 #include <sys/ioctl.h>
+#include "model.h"
 
 enum VIEW_TYPE {
     TEXT_TYPE = 1,
@@ -11,9 +12,12 @@ enum VIEW_TYPE {
 class View {
 public:
     int _x, _y;
-    virtual void draw (void) = 0;
-    virtual void clear(void) = 0;
-    virtual int  WinXY(void) = 0;
+    Model* _model;
+
+    virtual void draw    (void)         = 0;
+    virtual void clear   (void)         = 0;
+    virtual int  WinXY   (void)         = 0;
+    virtual void setModel(Model* model) = 0;
     
     View(void){}
 

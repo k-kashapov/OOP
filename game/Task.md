@@ -235,3 +235,89 @@ std::vector aaa();
 
 using namespace std;
 ```
+
+```
+model:
+    vector<rabbit>
+    vector<snake>
+
+rabbit:
+    std::pair(x, y);
+    using coord = std::pair(int, int);
+
+snake:
+    vector<coord> body;
+    move() {
+        body.head = '#';
+        body.push_head('>');
+        body.pop_back();
+    }
+```
+
+## Sem 4
+
+### Input
+
+#### Event driven programming:
+
+callback/subscribe model
+
+```
+view:
+    while (!end) {
+        read 1; // read event
+        read 2;
+        ...
+        read n; // subscribers
+           |---------^ iterate and call function on event
+    }
+
+    view::setOnKey(int (*handler)(int));
+
+others:
+    subscribe(event, func);
+
+e.g. model:
+    view->setOnKey(Model::onKey);
+
+    Model::onKey(int key) {
+        switch (key) {
+            ...
+        }
+    }
+```
+
+May change `draw()` name to `loop()`.
+
+To get input we need to disable line discipline.
+That's the first thing to do. Use `termios` interface:
+    
+    1) tcgetattr
+    2) tcsetattr
+    3) cfmakeraw
+
+```
+loop:
+    ctor() {
+        getattr;
+        remember attr;
+        setattr;
+    }
+
+    loop() {
+        ...
+    }
+
+    dtor() {
+        setattr(old attr);
+    }
+
+```
+
+Arrow keys:
+```
+\e[A ^
+\e[B V
+\e[C ->
+\e[D <-
+```

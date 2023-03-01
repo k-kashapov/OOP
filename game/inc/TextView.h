@@ -14,9 +14,11 @@ public:
     ~TextView()
     {}
 
-    void draw(void);
-    void clear(void);
-    int  WinXY(void);
+    void draw    (void)         override;
+    void clear   (void)         override;
+    int  WinXY   (void)         override;
+    void setModel(Model* model) override;
+    
     void setCaret(int x, int y);
     void vline(int x, int y, int len);
     void hline(int x, int y, int len);

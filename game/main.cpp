@@ -13,6 +13,10 @@ int main(int argc, const char **argv)
             v = View::get(TEXT_TYPE);
         }
 
+        Model m{};
+
+        v->setModel(&m);
+
         while (1) {
             v->draw();
         }
