@@ -2,10 +2,11 @@
 #define GUIVIEW_H
 
 #include "view.h"
+#include <SFML/Graphics.hpp>
 
 class GUIView : public View {
 public:
-    void draw    (void)         override;
+    void loop    (void)         override;
     void clear   (void)         override;
     int  WinXY   (void)         override;
     void setModel(Model* model) override;
@@ -14,14 +15,17 @@ public:
         return -1;
     }
 
-    GUIView(void) {}
-
-    GUIView(int x, int y):
-        View(x, y)
-    {}
+    GUIView(int x, int y);
     
     ~GUIView()
     {}
+
+private:
+    void draw(sf::Sprite& bun, sf::Sprite& snk);
+
+    sf::Texture      bunnyTex;
+    sf::Texture      snakeTex;
+    sf::RenderWindow window;
 };
 
 #endif // GUIVIEW_H

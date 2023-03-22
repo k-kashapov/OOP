@@ -18,9 +18,9 @@ public:
     int _x, _y;
     Model* _model;
 
-    virtual void draw    (void)         = 0;
-    virtual void clear   (void)         = 0;
-    virtual int  WinXY   (void)         = 0;
+    virtual void loop    ()             = 0;
+    virtual void clear   ()             = 0;
+    virtual int  WinXY   ()             = 0;
     virtual void setModel(Model* model) = 0;
     virtual int  getKey  ()             = 0;
     
@@ -33,7 +33,7 @@ public:
     void setOnKey(std::function<void(int)>);
     void callOnKey(int key);
     
-    static View *get(int what = 0);
+    static View *get(int what = 0, int x = -1, int y = -1);
     static View *_curr;
 
     virtual ~View()

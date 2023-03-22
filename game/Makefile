@@ -1,7 +1,9 @@
 CC  = gcc
 CXX = g++
 
-CXXFLAGS = -I inc -Wall -Wextra
+CXXFLAGS = -I inc -Wall -Wextra -lsfml-graphics -lsfml-window -lsfml-system
+include txx.mk
+
 DBGFLAGS = -fsanitize=address -ggdb3
 
 SRCS = main.cpp src/*.cpp

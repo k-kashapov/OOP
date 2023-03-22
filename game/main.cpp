@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 #include "view.h"
 #include "HumanController.h"
 
@@ -8,25 +9,22 @@ int main(int argc, const char **argv) {
 
     if(argc > 1) {
         if (std::string(argv[1]) == "GUI") {
-            v = View::get(GUI_TYPE);
+            if (argc < 4) {
+                std::cout << "USAGE: main.elf GUI [x: int] [y: int]" << std::endl;
+                return 0;
+            }
+
+            v = View::get(GUI_TYPE, std::stoi(argv[2]), std::stoi(argv[3]));
         } else {
             v = View::get(TEXT_TYPE);
         }
 
-        SnakeController c{};
         Model m{};
+        SnakeController c(&m.snake);
 
-        c.setSnake(&m.snake);
         v->setModel(&m);
 
-        while (1) {
-            int key = v->getKey();
-            if (key > 0) {
-                v->callOnKey(key);
-            }
-
-            v->draw();
-        }
+        v->loop();
 
         delete v;
     }

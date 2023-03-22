@@ -336,3 +336,33 @@ May need `std::function` and `std::bind`
 s->f(i) // we want to be able to call it with f(i)
 f = std::bind(s::f, s, _1)
 ```
+
+## Sem 4
+
+```
+SetTimer(interval)
+
+while (!final) {
+    t1 = time()
+    poll(...)
+    t2 = time()
+    diff = t2 - t1
+    timeout -= diff
+    if (timeout <= 0) {
+        call(timeout function)
+    }
+}
+```
+
+```
+View -> TextView:
+    paint(*Rabbit) // draw rabbit at it's coord
+    paint(*snake)  // draw snake body part
+
+    // These are used by model to update view on event
+    // Main no longer calls v->draw() every frame. Only on init or screen size change
+```
+
+```
+std::random_device
+```

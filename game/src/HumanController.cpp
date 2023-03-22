@@ -7,6 +7,12 @@ SnakeController::SnakeController() {
     v->setOnKey(std::bind(&SnakeController::onKeyPressed, this, std::placeholders::_1));
 }
 
+SnakeController::SnakeController(Snake *snake) {
+    View *v = View::get();
+    v->setOnKey(std::bind(&SnakeController::onKeyPressed, this, std::placeholders::_1));
+    m = snake;
+}
+
 SnakeController::~SnakeController() {}
 
 void SnakeController::setSnake(Snake *snake) {
@@ -18,10 +24,10 @@ void SnakeController::onKeyPressed(int key) {
         case 'w':
             m->dir = UP;
             break;
-        case 'a':
+        case 's':
             m->dir = DOWN;
             break;
-        case 's':
+        case 'a':
             m->dir = LEFT;
             break;
         case 'd':

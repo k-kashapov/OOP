@@ -12,8 +12,8 @@ Model::Model() {
         snake.body.push_back(coord{5, 5});
     }
 
-    for (int i = 0; i < 7; i++) {
-        rabbits.push_back(coord{rand() % 20 + 20, rand() % 20});
+    for (int i = 0; i < 17; i++) {
+        rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
     }
 }
 
@@ -24,12 +24,14 @@ static void moveCoord(coord &tgt, int dir, int len = 1) {
             break;
         case LEFT:
             tgt.first -= len;
+            if (tgt.first < 0) tgt.first = 0;
             break;
         case DOWN:
             tgt.second += len;
             break;
         case UP:
             tgt.second -= len;
+            if (tgt.second < 0) tgt.second = 0;
             break;
         default:
             std::cerr << "Unexpected direction: " << dir << std::endl;

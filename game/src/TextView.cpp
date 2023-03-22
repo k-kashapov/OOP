@@ -1,8 +1,14 @@
+#include <cstdint>
+#include <cstdio>
+#include <ctime>
+#include <functional>
 #include <iostream>
 #include <signal.h>
 #include <termios.h>
 #include <poll.h>
+#include <time.h>
 #include "TextView.h"
+#include "model.h"
 #include "view.h"
 
 static void win_hdlr(int param) {
@@ -64,6 +70,11 @@ void TextView::setCaret(int x, int y) {
     printf("\e[%d;%dH", y + 1, x + 1);
 }
 
+void TextView::drawPixel(int x, int y, int ch) {
+    printf("\e[%d;%dH", y + 1, x + 1);
+    putchar(ch);
+}
+
 void TextView::vline(int x, int y, int len) {
     for (int i = 0; i <= len; i++) {
         setCaret(x, y + i);
@@ -82,7 +93,7 @@ void TextView::setModel(Model* model) {
     _model = model;
 }
 
-void TextView::draw(void) {
+void TextView::draw() {
     clear();
     vline(0,  0, _y);
     vline(_x, 0, _y);
@@ -96,19 +107,17 @@ void TextView::draw(void) {
     _model->Update();
     
     for (coord &curr : _model->rabbits) {
-        setCaret(curr.first, curr.second);
-        putchar('#');
+        drawPixel(curr.first, curr.second, '#');
     }
 
     for (coord &curr : _model->snake.body) {
-        setCaret(curr.first, curr.second);
-        putchar('S');
+        drawPixel(curr.first, curr.second, 'S');
     }
 
     setCaret(_x, _y);
 
     fflush(stdout);
-    sleep(1);
+    usleep(100000);
 }
 
 void TextView::clear(void) {
@@ -124,10 +133,52 @@ int TextView::getKey() {
         std::cerr << "Polling keyboard error!\n" << std::endl;
     } else {
         if (fd.revents & POLLIN) {
-            read(STDIN_FILENO, key_buff, 128);
-            return key_buff[0];
+            int len = read(STDIN_FILENO, key_buff, 128);
+            return key_buff[len - 1];
         }
     }
 
     return -1;
+}
+
+void TextView::subTimer(const unsigned interval, hndlr func) {
+    timer_subs.push_back(std::pair<const unsigned, hndlr>(interval, func));
+    timer_vals.push_back(interval);
+}
+
+void TextView::tickTimer() {
+    static double last_time = 0;
+    double new_time = 0;
+
+    struct timespec tp;
+    int res = clock_gettime(CLOCK_REALTIME_COARSE, &tp);
+    if (res) {
+        fprintf(stderr, "Error getting time!!!\n");
+        return;
+    }
+
+    
+    
+    double diff = new_time - last_time;
+    for (auto &timer: timer_vals) {
+        timer -= diff;
+    }
+
+    last_time = new_time;
+}
+
+void TextView::loop() {
+    bool finish = false;
+
+    while (!finish) {
+        tickTimer();
+
+        int key = getKey();
+        if (key > 0) {
+            callOnKey(key);
+        }
+
+        draw();
+        if (key == 'q') finish = true;
+    }
 }

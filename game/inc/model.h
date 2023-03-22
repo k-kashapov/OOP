@@ -1,12 +1,14 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <functional>
 #include <utility>
 #include <list>
 #include <cstdlib>
 #include <ctime>
 
 using coord = std::pair<int, int>;
+using hndlr = std::function<void (int)>;
 
 enum DIRECTIONS {
     UP    = 0,

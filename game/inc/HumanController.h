@@ -11,6 +11,7 @@ private:
 
 public:
     SnakeController();
+    SnakeController(Snake *snake);
     ~SnakeController();
     
     void onKeyPressed(int key);
