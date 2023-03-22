@@ -20,7 +20,7 @@ CXXFLAGS += \
            -Wuseless-cast -Wvariadic-macros -Wno-literal-suffix            \
            -Wno-missing-field-initializers -Wno-narrowing                  \
            -Wno-old-style-cast -Wno-varargs -fcheck-new                    \
-           -fsized-deallocation -fstack-check -fstack-protector            \
+           -fsized-deallocation -fstack-protector                          \
            -fstrict-overflow -flto-odr-type-merging                        \
            -fno-omit-frame-pointer                                         \
            -fPIE                                                           \

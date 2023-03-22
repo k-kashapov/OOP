@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <cstdio>
 #include <ctime>
 #include <functional>
@@ -10,6 +9,8 @@
 #include "TextView.h"
 #include "model.h"
 #include "view.h"
+
+#define POLL_TIME_MS 50
 
 static void win_hdlr(int param) {
     (void) param;
@@ -104,20 +105,21 @@ void TextView::draw() {
     setCaret(_x / 2 - 15, _y / 2);
     printf("Drawing window of size (%d, %d)\n", _x, _y);
 
-    _model->Update();
+    // _model->Update();
     
     for (coord &curr : _model->rabbits) {
+        // std::cerr << "drawing rabbit at (" << curr.first << ", " << curr.second << ")" << std::endl;
         drawPixel(curr.first, curr.second, '#');
     }
 
     for (coord &curr : _model->snake.body) {
+        // std::cerr << "drawing snake at (" << curr.first << ", " << curr.second << ")" << std::endl;
         drawPixel(curr.first, curr.second, 'S');
     }
 
     setCaret(_x, _y);
 
     fflush(stdout);
-    usleep(100000);
 }
 
 void TextView::clear(void) {
@@ -128,12 +130,13 @@ int TextView::getKey() {
     int key_buff[128];
 
     pollfd fd = {.fd = STDIN_FILENO, .events = POLLIN, .revents = 0};
-    int res = poll(&fd, 1, 100);
+    int res = poll(&fd, 1, POLL_TIME_MS);
     if (res < 0) {
         std::cerr << "Polling keyboard error!\n" << std::endl;
     } else {
         if (fd.revents & POLLIN) {
-            int len = read(STDIN_FILENO, key_buff, 128);
+            ssize_t len = read(STDIN_FILENO, key_buff, 128);
+            std::cerr << "read = " << (char)key_buff[len - 1] << std::endl;
             return key_buff[len - 1];
         }
     }
@@ -141,14 +144,21 @@ int TextView::getKey() {
     return -1;
 }
 
-void TextView::subTimer(const unsigned interval, hndlr func) {
-    timer_subs.push_back(std::pair<const unsigned, hndlr>(interval, func));
-    timer_vals.push_back(interval);
+void TextView::subTimer(const long interval, hndlr func) {
+    if (interval <= POLL_TIME_MS) {
+        std::cerr << "ERROR: could not subscribe to timer: Interval too small: " << interval << " <= " << POLL_TIME_MS << std::endl;
+        return;
+    }
+
+    timer_subs.push_back(std::pair<const long, hndlr>(interval - POLL_TIME_MS, func));
+    timer_vals.push_back(interval - POLL_TIME_MS);
 }
 
 void TextView::tickTimer() {
-    static double last_time = 0;
-    double new_time = 0;
+    const  uint64_t tick      = 1000;
+    static uint64_t last_time = 0;
+    
+    uint64_t new_time  = 0;
 
     struct timespec tp;
     int res = clock_gettime(CLOCK_REALTIME_COARSE, &tp);
@@ -157,14 +167,18 @@ void TextView::tickTimer() {
         return;
     }
 
-    
-    
-    double diff = new_time - last_time;
-    for (auto &timer: timer_vals) {
-        timer -= diff;
-    }
-
+    new_time = (uint64_t)tp.tv_sec * 1000000 + (uint64_t)tp.tv_nsec / 1000;
+    uint64_t diff_ticks = (new_time - last_time) / tick;
     last_time = new_time;
+
+    for (unsigned long iter = 0; iter < timer_vals.size(); iter++) {
+        timer_vals[iter] -= (long) diff_ticks;
+
+        if (timer_vals[iter] < 0) {
+            timer_vals[iter] = timer_subs[iter].first;
+            timer_subs[iter].second();
+        }
+    }
 }
 
 void TextView::loop() {
@@ -173,12 +187,13 @@ void TextView::loop() {
     while (!finish) {
         tickTimer();
 
-        int key = getKey();
+        char key = (char)getKey();
+        if (key == 'q') finish = true;
+
         if (key > 0) {
             callOnKey(key);
         }
 
         draw();
-        if (key == 'q') finish = true;
     }
 }

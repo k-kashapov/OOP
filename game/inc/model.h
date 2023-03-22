@@ -8,7 +8,7 @@
 #include <ctime>
 
 using coord = std::pair<int, int>;
-using hndlr = std::function<void (int)>;
+using hndlr = std::function<void ()>;
 
 enum DIRECTIONS {
     UP    = 0,

@@ -23,6 +23,7 @@ int main(int argc, const char **argv) {
         SnakeController c(&m.snake);
 
         v->setModel(&m);
+        v->subTimer(150, std::bind(&Model::Update, &m));
 
         v->loop();
 

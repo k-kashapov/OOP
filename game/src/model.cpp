@@ -4,7 +4,7 @@
 #include "model.h"
 
 Model::Model() {
-    std::srand(std::time(NULL));
+    std::srand((unsigned)std::time(NULL));
 
     snake.dir = RIGHT;
 
@@ -12,7 +12,7 @@ Model::Model() {
         snake.body.push_back(coord{5, 5});
     }
 
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 7; i++) {
         rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
     }
 }
@@ -40,6 +40,9 @@ static void moveCoord(coord &tgt, int dir, int len = 1) {
 }
 
 void Model::Update() {
+    static uint64_t frames = 0;
+    frames++;
+
     snake.body.pop_back();
 
     coord new_head = snake.body.front();
@@ -47,10 +50,10 @@ void Model::Update() {
 
     snake.body.push_front(new_head);
 
-    for (auto &rabbit : rabbits){
-        int dir = rand() % 4;
-        moveCoord(rabbit, dir);
+    if (!(frames % 4)) {
+        for (auto &rabbit : rabbits) {
+            int dir = rand() % 4;
+            moveCoord(rabbit, dir);
+        }
     }
-
-    return;
 }

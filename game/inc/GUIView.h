@@ -20,6 +20,8 @@ public:
     ~GUIView()
     {}
 
+    void subTimer(const long interval, hndlr func) override;
+
 private:
     void draw(sf::Sprite& bun, sf::Sprite& snk);
 

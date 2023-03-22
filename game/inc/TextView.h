@@ -1,8 +1,8 @@
 #ifndef TEXTVIEW_H
 #define TEXTVIEW_H
 
-#include "view.h"
 #include <functional>
+#include "view.h"
 
 class TextView : public View {
 public:
@@ -26,14 +26,10 @@ public:
     void vline(int x, int y, int len);
     void hline(int x, int y, int len);
 
-    void subTimer(const unsigned interval, hndlr func);
+    void subTimer(const long interval, hndlr func) override;
 
 private:
     void draw();
-
-    std::list<std::pair<const unsigned, hndlr>> timer_subs;
-    std::list<unsigned>                         timer_vals;
-
     void tickTimer();
 };
 

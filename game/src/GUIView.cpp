@@ -1,7 +1,7 @@
 #include <iostream>
 #include "GUIView.h"
 
-GUIView::GUIView(int x, int y): View(x, y), window(sf::VideoMode(_x, _y), "Snaaaaake") {
+GUIView::GUIView(int x, int y): View(x, y), window(sf::VideoMode((unsigned)_x, (unsigned)_y), "Snaaaaake") {
     window.setFramerateLimit(2);
 
     bunnyTex.loadFromFile("sprites/bunny.png");
@@ -25,15 +25,15 @@ void GUIView::draw(sf::Sprite& bun, sf::Sprite& snk) {
     std::cout << "GUIView(" << _x << ", " << _y << ") draw called\n";
     _model->Update();
 
-    window.clear(sf::Color::Cyan);
+    clear();
 
     for (coord &curr : _model->rabbits) {
-        bun.setPosition(curr.first * 20, curr.second * 20);
+        bun.setPosition((float) (curr.first * 20), (float) (curr.second * 20));
         window.draw(bun);
     }
 
     for (coord &curr : _model->snake.body) {
-        snk.setPosition(curr.first * 20, curr.second * 20);
+        snk.setPosition((float) (curr.first * 20), (float) (curr.second * 20));
         window.draw(snk);
     }
 
@@ -65,6 +65,12 @@ void GUIView::loop(void) {
     }
 }
 
-void GUIView::clear(void) {
+void GUIView::subTimer(const long interval, hndlr func) {
+    (void) interval;
+    (void) func;
     std::cout << "GUIView(" << _x << ", " << _y << ") clear called\n";
+}
+
+inline void GUIView::clear(void) {
+    window.clear(sf::Color::Cyan);
 }

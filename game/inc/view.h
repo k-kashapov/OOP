@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <sys/ioctl.h>
+#include <vector>
 #include "model.h"
 
 enum VIEW_TYPE {
@@ -13,6 +14,8 @@ enum VIEW_TYPE {
 class View {
 protected:
     std::list<std::function<void(int)>> onKeySubs;
+    std::vector<std::pair<const long, hndlr>> timer_subs;
+    std::vector<long>                         timer_vals;
 
 public:
     int _x, _y;
@@ -32,6 +35,8 @@ public:
     
     void setOnKey(std::function<void(int)>);
     void callOnKey(int key);
+    
+    virtual void subTimer(const long interval, hndlr func) = 0;
     
     static View *get(int what = 0, int x = -1, int y = -1);
     static View *_curr;
