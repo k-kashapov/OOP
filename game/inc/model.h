@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 
-using coord = std::pair<int, int>;
+using coord = std::pair<unsigned, unsigned>;
 using hndlr = std::function<void ()>;
 
 enum DIRECTIONS {
@@ -25,15 +25,22 @@ public:
 };
 
 class Model {
-public:
-    std::list<coord> rabbits;
-    
-    Snake snake;
-    
+public:    
     Model();
     ~Model() {};
     
     void Update();
+    Snake snake;
+    std::list<coord> rabbits;    
+
+    void SetXY(unsigned x, unsigned y);
+
+private:
+    coord borders;
+
+    void MoveRabbits();
+    int  RabbitEaten();
+    void moveCoord(coord &tgt, int dir, unsigned len = 1);
 };
 
 #endif // MODEL_H

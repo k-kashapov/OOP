@@ -18,7 +18,7 @@ protected:
     std::vector<long>                         timer_vals;
 
 public:
-    int _x, _y;
+    unsigned _x, _y;
     Model* _model;
 
     virtual void loop    ()             = 0;
@@ -29,7 +29,7 @@ public:
     
     View(void){}
 
-    View(int x, int y):
+    View(unsigned x, unsigned y):
         _x(x), _y(y)
     {}
     
@@ -38,7 +38,7 @@ public:
     
     virtual void subTimer(const long interval, hndlr func) = 0;
     
-    static View *get(int what = 0, int x = -1, int y = -1);
+    static View *get(int what = 0, unsigned x = 0, unsigned y = 0);
     static View *_curr;
 
     virtual ~View()

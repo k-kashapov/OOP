@@ -14,7 +14,7 @@ int main(int argc, const char **argv) {
                 return 0;
             }
 
-            v = View::get(GUI_TYPE, std::stoi(argv[2]), std::stoi(argv[3]));
+            v = View::get(GUI_TYPE, (unsigned) std::stoul(argv[2]), (unsigned) std::stoul(argv[3]));
         } else {
             v = View::get(TEXT_TYPE);
         }

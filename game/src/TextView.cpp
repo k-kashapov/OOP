@@ -64,34 +64,41 @@ int TextView::WinXY() {
     _x = size.ws_col;
     _y = size.ws_row;
 
+    if (_model) _model->SetXY(_x, _y);
+
     return 0;
 }
 
-void TextView::setCaret(int x, int y) {
-    printf("\e[%d;%dH", y + 1, x + 1);
+void TextView::setCaret(unsigned x, unsigned y) {
+    printf("\e[%u;%uH", y + 1, x + 1);
 }
 
-void TextView::drawPixel(int x, int y, int ch) {
-    printf("\e[%d;%dH", y + 1, x + 1);
+void TextView::setColor(int fg, int bg) {
+    printf("\e[%d;%dm", 30 + fg, 40 + bg);
+}
+
+void TextView::drawPixel(unsigned x, unsigned y, int ch) {
+    printf("\e[%u;%uH", y + 1, x + 1);
     putchar(ch);
 }
 
-void TextView::vline(int x, int y, int len) {
-    for (int i = 0; i <= len; i++) {
+void TextView::vline(unsigned x, unsigned y, unsigned len) {
+    for (unsigned i = 0; i <= len; i++) {
         setCaret(x, y + i);
         putchar('|');
     }
 }
 
-void TextView::hline(int x, int y, int len) {
+void TextView::hline(unsigned x, unsigned y, unsigned len) {
     setCaret(x, y);
-    for (int i = 0; i <= len; i++) {
+    for (unsigned i = 0; i <= len; i++) {
         putchar('-');
     }
 }
 
 void TextView::setModel(Model* model) {
     _model = model;
+    _model->SetXY(_x, _y);
 }
 
 void TextView::draw() {
@@ -103,19 +110,22 @@ void TextView::draw() {
     hline(0, _y, _x - 2);
 
     setCaret(_x / 2 - 15, _y / 2);
-    printf("Drawing window of size (%d, %d)\n", _x, _y);
+    printf("Drawing window of size (%u, %u)\n", _x, _y);
 
     // _model->Update();
-    
+
+    setColor(BRIGHT(COLOR_BLUE), COLOR_BLCK);
     for (coord &curr : _model->rabbits) {
         // std::cerr << "drawing rabbit at (" << curr.first << ", " << curr.second << ")" << std::endl;
         drawPixel(curr.first, curr.second, '#');
     }
 
+    setColor(COLOR_BLCK, COLOR_GREN);
     for (coord &curr : _model->snake.body) {
         // std::cerr << "drawing snake at (" << curr.first << ", " << curr.second << ")" << std::endl;
         drawPixel(curr.first, curr.second, 'S');
     }
+    setColor(BRIGHT(COLOR_WHIT), COLOR_BLCK);
 
     setCaret(_x, _y);
 
@@ -136,7 +146,7 @@ int TextView::getKey() {
     } else {
         if (fd.revents & POLLIN) {
             ssize_t len = read(STDIN_FILENO, key_buff, 128);
-            std::cerr << "read = " << (char)key_buff[len - 1] << std::endl;
+            // std::cerr << "read = " << (char)key_buff[len - 1] << std::endl;
             return key_buff[len - 1];
         }
     }

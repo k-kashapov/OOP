@@ -1,7 +1,7 @@
 #include <iostream>
 #include "GUIView.h"
 
-GUIView::GUIView(int x, int y): View(x, y), window(sf::VideoMode((unsigned)_x, (unsigned)_y), "Snaaaaake") {
+GUIView::GUIView(unsigned x, unsigned y): View(x, y), window(sf::VideoMode(_x, _y), "Snaaaaake") {
     window.setFramerateLimit(2);
 
     bunnyTex.loadFromFile("sprites/bunny.png");

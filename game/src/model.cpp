@@ -3,6 +3,11 @@
 #include <iostream>
 #include "model.h"
 
+#define RABBIT_CD      6 // Rabbit jump cooldown
+#define RABBIT_JMP_LEN 3
+#define RABBIT_SENSE   20 // Distance of snake detection
+#define NEAR_DEATH     2  // Distance of rabbit perpendicular movement
+
 Model::Model() {
     std::srand((unsigned)std::time(NULL));
 
@@ -12,31 +17,82 @@ Model::Model() {
         snake.body.push_back(coord{5, 5});
     }
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 97; i++) {
         rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
     }
 }
 
-static void moveCoord(coord &tgt, int dir, int len = 1) {
+void Model::moveCoord(coord &tgt, int dir, unsigned len) {
     switch (dir) {
         case RIGHT:
             tgt.first += len;
+            if (tgt.first >= borders.first) tgt.first = 1;
             break;
         case LEFT:
+            if (tgt.first <= len) tgt.first = borders.first;
             tgt.first -= len;
-            if (tgt.first < 0) tgt.first = 0;
             break;
         case DOWN:
             tgt.second += len;
+            if (tgt.second >= borders.second) tgt.second = 1;
             break;
         case UP:
+            if (tgt.second <= len) tgt.second = borders.second;
             tgt.second -= len;
-            if (tgt.second < 0) tgt.second = 0;
             break;
         default:
             std::cerr << "Unexpected direction: " << dir << std::endl;
             break;
     }
+}
+
+static unsigned euclDistSqr(const coord& a, const coord& b) {
+    return (a.first - b.first)  * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+}
+
+static coord getClosest(const coord &from, const std::list<coord>& to) {
+    unsigned dist = -1U;
+    coord res = to.front();
+
+    for (auto& iter : to) {
+        unsigned new_dist = euclDistSqr(from, iter);
+        if (new_dist < dist) {
+            dist = new_dist;
+            res = iter;
+        }
+    }
+
+    return res;
+}
+
+void Model::MoveRabbits() {
+    for (auto rabbit = rabbits.begin(); rabbit != rabbits.end(); ++rabbit) {
+        coord closest = getClosest(*rabbit, snake.body);
+        unsigned dist = euclDistSqr(closest, *rabbit);
+        int dir = UP;
+
+        if (dist > RABBIT_SENSE * RABBIT_SENSE) {
+            dir = rand() % 4;
+        } else if (dist < NEAR_DEATH * NEAR_DEATH && dist > 0) {
+            dir = (snake.dir + 2) % 4; // Perpendicular movement
+        } else {
+            if      (closest.first  > rabbit->first)  dir = LEFT;
+            else if (closest.second > rabbit->second) dir = UP;
+            else if (closest.first  < rabbit->first)  dir = RIGHT;
+            else if (closest.second < rabbit->second) dir = DOWN;
+            else {
+                rabbit = rabbits.erase(rabbit);
+                snake.body.push_back(snake.body.back());
+            }
+        }
+
+        moveCoord(*rabbit, dir, RABBIT_JMP_LEN);
+    }
+}
+
+void Model::SetXY(unsigned x, unsigned y) {
+    borders.first  = x - 1;
+    borders.second = y - 1;
 }
 
 void Model::Update() {
@@ -50,10 +106,7 @@ void Model::Update() {
 
     snake.body.push_front(new_head);
 
-    if (!(frames % 4)) {
-        for (auto &rabbit : rabbits) {
-            int dir = rand() % 4;
-            moveCoord(rabbit, dir);
-        }
+    if (!(frames % RABBIT_CD)) {
+        MoveRabbits();
     }
 }

@@ -5,7 +5,7 @@
 
 View *View::_curr = NULL;
 
-View *View::get(int what, int x, int y) {
+View *View::get(int what, unsigned x, unsigned y) {
     switch(what) {
         case 1:  [[fallthrough]];
         default:

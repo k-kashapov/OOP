@@ -15,7 +15,7 @@ public:
         return -1;
     }
 
-    GUIView(int x, int y);
+    GUIView(unsigned x, unsigned y);
     
     ~GUIView()
     {}
