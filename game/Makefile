@@ -1,7 +1,7 @@
 CC  = gcc
 CXX = g++
 
-CXXFLAGS = -I inc -Wall -Wextra -lsfml-graphics -lsfml-window -lsfml-system
+CXXFLAGS = -I inc -Wall -Wextra -lsfml-graphics -lsfml-window -lsfml-system -O2
 include txx.mk
 
 DBGFLAGS = -fsanitize=address -ggdb3

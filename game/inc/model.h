@@ -52,6 +52,6 @@ private:
     void moveCoord(coord &tgt, int dir, unsigned len = 1);
 };
 
-coord getClosest(const coord &from, const std::list<coord>& to);
+coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);
 
 #endif // MODEL_H

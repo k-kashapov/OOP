@@ -13,7 +13,6 @@ AIController::~AIController() {}
 
 void AIController::calculatePath() {
     coord closest = getClosest(m->body.front(), *r);
-
     
 }
 

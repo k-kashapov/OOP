@@ -3,10 +3,10 @@
 #include <iostream>
 #include "model.h"
 
-#define RABBIT_JMP_LEN  4
-#define RABBIT_CD       6 // Rabbit jump cooldown
+#define RABBIT_JMP_LEN  2
+#define RABBIT_CD       4 // Rabbit jump cooldown
 #define RABBIT_SENSE   20 // Distance of snake detection
-#define NEAR_DEATH      2 // Distance of rabbit perpendicular movement
+#define NEAR_DEATH      3 // Distance of rabbit perpendicular movement
 
 #define SNAKE_CD 1 // Snake movement cooldown
 
@@ -29,7 +29,7 @@ Model::Model(int num) {
         }
 
         for (int i = 0; i < 200; i++) {
-            rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
+            rabbits.push_back(coord{rand() % 15 + 150, rand() % 10 + 40});
         }
 
         init_y += 3;
@@ -64,7 +64,7 @@ static unsigned euclDistSqr(const coord& a, const coord& b) {
     return (a.first - b.first)  * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
 }
 
-coord getClosest(const coord &from, const std::list<coord>& to) {
+coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res) {
     unsigned dist = -1U;
     coord res = to.front();
 
@@ -73,6 +73,9 @@ coord getClosest(const coord &from, const std::list<coord>& to) {
         if (new_dist < dist) {
             dist = new_dist;
             res = iter;
+            if (dist_res) {
+                *dist_res = new_dist;
+            }
         }
     }
 
@@ -80,11 +83,21 @@ coord getClosest(const coord &from, const std::list<coord>& to) {
 }
 
 void Model::MoveRabbits() {
-    auto snake = snakes.begin();
-
     for (auto rabbit = rabbits.begin(); rabbit != rabbits.end(); ++rabbit) {
-        coord closest = getClosest(*rabbit, snake->body);
-        unsigned dist = euclDistSqr(closest, *rabbit);
+        coord closest;
+        Snake *snake;
+        unsigned dist = -1U;
+
+        for (auto curr_snake = snakes.begin(); curr_snake != snakes.end(); curr_snake++) {
+            unsigned new_dist;
+            coord curr_closest = getClosest(*rabbit, curr_snake->body, &new_dist);
+            if (new_dist < dist) {
+                dist    = new_dist;
+                snake   = &(*curr_snake);
+                closest = curr_closest;
+            }
+        }
+
         int dir = UP;
 
         if (dist > RABBIT_SENSE * RABBIT_SENSE) {
@@ -102,7 +115,7 @@ void Model::MoveRabbits() {
             }
         }
 
-        moveCoord(*rabbit, dir, ((unsigned)rand() % (RABBIT_JMP_LEN / 2) + RABBIT_JMP_LEN / 2));
+        moveCoord(*rabbit, dir, RABBIT_JMP_LEN);
     }
 }
 
