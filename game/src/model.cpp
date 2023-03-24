@@ -3,22 +3,36 @@
 #include <iostream>
 #include "model.h"
 
-#define RABBIT_CD      6 // Rabbit jump cooldown
-#define RABBIT_JMP_LEN 3
+#define RABBIT_JMP_LEN  4
+#define RABBIT_CD       6 // Rabbit jump cooldown
 #define RABBIT_SENSE   20 // Distance of snake detection
-#define NEAR_DEATH     2  // Distance of rabbit perpendicular movement
+#define NEAR_DEATH      2 // Distance of rabbit perpendicular movement
 
-Model::Model() {
+#define SNAKE_CD 1 // Snake movement cooldown
+
+Model::Model(int num) {
     std::srand((unsigned)std::time(NULL));
 
-    snake.dir = RIGHT;
-
-    for (int i = 0; i < 7; i++) {
-        snake.body.push_back(coord{5, 5});
+    for (int i = 0; i < num; i++) {
+        snakes.push_back(Snake());
     }
 
-    for (int i = 0; i < 97; i++) {
-        rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
+    unsigned init_y = 5;
+
+    for (auto& snake : snakes) {
+        snake.dir = RIGHT;
+
+        unsigned init_x = 5;
+
+        for (int i = 0; i < 7; i++) {
+            snake.body.push_front(coord{init_x++, init_y});
+        }
+
+        for (int i = 0; i < 200; i++) {
+            rabbits.push_back(coord{rand() % 15 + 15, rand() % 10 + 10});
+        }
+
+        init_y += 3;
     }
 }
 
@@ -50,7 +64,7 @@ static unsigned euclDistSqr(const coord& a, const coord& b) {
     return (a.first - b.first)  * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
 }
 
-static coord getClosest(const coord &from, const std::list<coord>& to) {
+coord getClosest(const coord &from, const std::list<coord>& to) {
     unsigned dist = -1U;
     coord res = to.front();
 
@@ -66,15 +80,17 @@ static coord getClosest(const coord &from, const std::list<coord>& to) {
 }
 
 void Model::MoveRabbits() {
+    auto snake = snakes.begin();
+
     for (auto rabbit = rabbits.begin(); rabbit != rabbits.end(); ++rabbit) {
-        coord closest = getClosest(*rabbit, snake.body);
+        coord closest = getClosest(*rabbit, snake->body);
         unsigned dist = euclDistSqr(closest, *rabbit);
         int dir = UP;
 
         if (dist > RABBIT_SENSE * RABBIT_SENSE) {
             dir = rand() % 4;
         } else if (dist < NEAR_DEATH * NEAR_DEATH && dist > 0) {
-            dir = (snake.dir + 2) % 4; // Perpendicular movement
+            dir = (snake->dir + 2) % 4; // Perpendicular movement
         } else {
             if      (closest.first  > rabbit->first)  dir = LEFT;
             else if (closest.second > rabbit->second) dir = UP;
@@ -82,12 +98,27 @@ void Model::MoveRabbits() {
             else if (closest.second < rabbit->second) dir = DOWN;
             else {
                 rabbit = rabbits.erase(rabbit);
-                snake.body.push_back(snake.body.back());
+                snake->body.push_back(snake->body.back());
             }
         }
 
-        moveCoord(*rabbit, dir, RABBIT_JMP_LEN);
+        moveCoord(*rabbit, dir, ((unsigned)rand() % (RABBIT_JMP_LEN / 2) + RABBIT_JMP_LEN / 2));
     }
+}
+
+void Model::MoveSnake(Snake& snake) {
+    snake.body.pop_back();
+
+    coord new_head = snake.body.front();
+    moveCoord(new_head, snake.dir);
+
+    for (coord& part: snake.body) {
+        if (part == new_head) {
+            state = DEAD;
+        }
+    }
+
+    snake.body.push_front(new_head);
 }
 
 void Model::SetXY(unsigned x, unsigned y) {
@@ -99,12 +130,10 @@ void Model::Update() {
     static uint64_t frames = 0;
     frames++;
 
-    snake.body.pop_back();
-
-    coord new_head = snake.body.front();
-    moveCoord(new_head, snake.dir);
-
-    snake.body.push_front(new_head);
+    if (!(frames % SNAKE_CD)) {
+        for (auto& snake : snakes)
+            MoveSnake(snake);
+    }
 
     if (!(frames % RABBIT_CD)) {
         MoveRabbits();

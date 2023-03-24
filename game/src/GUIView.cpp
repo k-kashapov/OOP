@@ -32,9 +32,11 @@ void GUIView::draw(sf::Sprite& bun, sf::Sprite& snk) {
         window.draw(bun);
     }
 
-    for (coord &curr : _model->snake.body) {
-        snk.setPosition((float) (curr.first * 20), (float) (curr.second * 20));
-        window.draw(snk);
+    for (Snake& snake : _model->snakes) {
+        for (coord &curr : snake.body) {
+            snk.setPosition((float) (curr.first * 20), (float) (curr.second * 20));
+            window.draw(snk);
+        }
     }
 
     window.display();

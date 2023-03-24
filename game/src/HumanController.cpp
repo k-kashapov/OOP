@@ -22,16 +22,20 @@ void SnakeController::setSnake(Snake *snake) {
 void SnakeController::onKeyPressed(int key) {
     switch (key) {
         case 'w':
-            m->dir = UP;
+            if ((++m->body.begin())->second >= m->body.front().second)
+                m->dir = UP;
             break;
         case 's':
-            m->dir = DOWN;
+            if ((++m->body.begin())->second <= m->body.front().second)
+                m->dir = DOWN;
             break;
         case 'a':
-            m->dir = LEFT;
+            if ((++m->body.begin())->first >= m->body.front().first)
+                m->dir = LEFT;
             break;
         case 'd':
-            m->dir = RIGHT;
+            if ((++m->body.begin())->first <= m->body.front().first)
+                m->dir = RIGHT;
             break;
         default:
             break;

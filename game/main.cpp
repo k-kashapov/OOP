@@ -19,11 +19,11 @@ int main(int argc, const char **argv) {
             v = View::get(TEXT_TYPE);
         }
 
-        Model m{};
-        SnakeController c(&m.snake);
+        Model m{5};
+        SnakeController c(&m.snakes.front());
 
         v->setModel(&m);
-        v->subTimer(150, std::bind(&Model::Update, &m));
+        v->subTimer(70, std::bind(&Model::Update, &m));
 
         v->loop();
 

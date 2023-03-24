@@ -17,20 +17,29 @@ enum DIRECTIONS {
     RIGHT = 3,
 };
 
+enum STATES {
+    MENU    = 0,
+    RUNNING = 1,
+    DEAD    = 2,
+    WIN     = 3,
+};
+
 class Snake {
 public:
     std::list<coord> body;
-    DIRECTIONS dir;
     void onKey(int key);
+    DIRECTIONS dir = RIGHT;
 };
 
 class Model {
-public:    
-    Model();
+public:
+    unsigned state = RUNNING;
+
+    Model(int num = 1);
     ~Model() {};
     
     void Update();
-    Snake snake;
+    std::list<Snake> snakes;
     std::list<coord> rabbits;    
 
     void SetXY(unsigned x, unsigned y);
@@ -39,8 +48,10 @@ private:
     coord borders;
 
     void MoveRabbits();
-    int  RabbitEaten();
+    void MoveSnake(Snake &snake);
     void moveCoord(coord &tgt, int dir, unsigned len = 1);
 };
+
+coord getClosest(const coord &from, const std::list<coord>& to);
 
 #endif // MODEL_H

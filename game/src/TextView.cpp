@@ -120,10 +120,15 @@ void TextView::draw() {
         drawPixel(curr.first, curr.second, '#');
     }
 
-    setColor(COLOR_BLCK, COLOR_GREN);
-    for (coord &curr : _model->snake.body) {
-        // std::cerr << "drawing snake at (" << curr.first << ", " << curr.second << ")" << std::endl;
-        drawPixel(curr.first, curr.second, 'S');
+    int snk_clr = COLOR_GREN;
+
+    for (Snake& snake : _model->snakes) {
+        setColor(COLOR_BLCK, snk_clr);
+        snk_clr = (snk_clr + 1) % COLORS_NUM;
+        for (coord &curr : snake.body) {
+            // std::cerr << "drawing snake at (" << curr.first << ", " << curr.second << ")" << std::endl;
+            drawPixel(curr.first, curr.second, 'S');
+        }
     }
     setColor(BRIGHT(COLOR_WHIT), COLOR_BLCK);
 
@@ -137,7 +142,7 @@ void TextView::clear(void) {
 }
 
 int TextView::getKey() {
-    int key_buff[128];
+    int key_buff[32];
 
     pollfd fd = {.fd = STDIN_FILENO, .events = POLLIN, .revents = 0};
     int res = poll(&fd, 1, POLL_TIME_MS);
@@ -205,5 +210,7 @@ void TextView::loop() {
         }
 
         draw();
+
+        if (_model->state != RUNNING) finish = true;
     }
 }

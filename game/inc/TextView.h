@@ -4,14 +4,18 @@
 #include <functional>
 #include "view.h"
 
-#define COLOR_BLCK 0
-#define COLOR_RED  1
-#define COLOR_GREN 2
-#define COLOR_YELW 3
-#define COLOR_BLUE 4
-#define COLOR_MGNT 5
-#define COLOR_CYAN 6
-#define COLOR_WHIT 7
+enum COLOR {
+    COLOR_BLCK = 0,
+    COLOR_RED  = 1,
+    COLOR_GREN = 2,
+    COLOR_YELW = 3,
+    COLOR_BLUE = 4,
+    COLOR_MGNT = 5,
+    COLOR_CYAN = 6,
+    COLOR_WHIT = 7,
+    COLORS_NUM
+};
+
 #define BRIGHT(color) (color + 60U)
 
 class TextView : public View {
