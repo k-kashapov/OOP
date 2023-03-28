@@ -125,9 +125,13 @@ void TextView::draw() {
     for (Snake& snake : _model->snakes) {
         setColor(COLOR_BLCK, snk_clr);
         snk_clr = (snk_clr + 1) % COLORS_NUM;
-        for (coord &curr : snake.body) {
+        auto curr = snake.body.begin();
+        drawPixel(curr->first, curr->second, '@');
+        ++curr;
+
+        for (; curr != snake.body.end(); curr++) {
             // std::cerr << "drawing snake at (" << curr.first << ", " << curr.second << ")" << std::endl;
-            drawPixel(curr.first, curr.second, 'S');
+            drawPixel(curr->first, curr->second, 'S');
         }
     }
     setColor(BRIGHT(COLOR_WHIT), COLOR_BLCK);
@@ -202,15 +206,23 @@ void TextView::loop() {
     while (!finish) {
         tickTimer();
 
+        finish = true;
+
+        for (auto& snake : _model->snakes) {
+            if (snake.state == RUNNING) {
+                finish = false;
+                break;
+            }
+        }
+        
         char key = (char)getKey();
-        if (key == 'q') finish = true;
 
         if (key > 0) {
             callOnKey(key);
         }
 
-        draw();
+        if (key == 'q') finish = true;
 
-        if (_model->state != RUNNING) finish = true;
+        draw();
     }
 }

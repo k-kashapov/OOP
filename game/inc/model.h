@@ -8,13 +8,20 @@
 #include <ctime>
 
 using coord = std::pair<unsigned, unsigned>;
-using hndlr = std::function<void ()>;
+using hndlr = std::function<void ()>; 
 
 enum DIRECTIONS {
     UP    = 0,
     DOWN  = 1,
     LEFT  = 2,
     RIGHT = 3,
+};
+
+const coord coord_arr[4] = {
+    [UP]    = { 0, -1},
+    [DOWN]  = { 0,  1},
+    [LEFT]  = {-1,  0},
+    [RIGHT] = { 1,  0}
 };
 
 enum STATES {
@@ -28,13 +35,12 @@ class Snake {
 public:
     std::list<coord> body;
     void onKey(int key);
-    DIRECTIONS dir = RIGHT;
+    int dir = RIGHT;
+    unsigned state = RUNNING;
 };
 
 class Model {
 public:
-    unsigned state = RUNNING;
-
     Model(int num = 1);
     ~Model() {};
     
@@ -43,13 +49,13 @@ public:
     std::list<coord> rabbits;    
 
     void SetXY(unsigned x, unsigned y);
+    void moveCoord(coord &tgt, int dir, unsigned len = 1);
 
 private:
     coord borders;
 
     void MoveRabbits();
     void MoveSnake(Snake &snake);
-    void moveCoord(coord &tgt, int dir, unsigned len = 1);
 };
 
 coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);

@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "view.h"
 #include "HumanController.h"
+#include "AIController.h"
 
 int main(int argc, const char **argv) {
     View *v;
@@ -19,12 +20,15 @@ int main(int argc, const char **argv) {
             v = View::get(TEXT_TYPE);
         }
 
-        Model m{5};
+        Model m{2};
         SnakeController c(&m.snakes.front());
 
-        v->setModel(&m);
-        v->subTimer(100, std::bind(&Model::Update, &m));
+        AIController ai1(&*(++m.snakes.begin()), &m.rabbits);
 
+        v->setModel(&m);
+        v->subTimer(120, std::bind(&AIController::calculatePath, &ai1));
+        v->subTimer(60, std::bind(&Model::Update, &m));
+        
         v->loop();
 
         delete v;

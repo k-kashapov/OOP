@@ -4,7 +4,7 @@
 #include "view.h"
 #include <SFML/Graphics.hpp>
 
-class GUIView : public View {
+class GUIView final : public View {
 public:
     void loop    (void)         override;
     void clear   (void)         override;

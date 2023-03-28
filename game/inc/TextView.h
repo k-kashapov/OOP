@@ -18,7 +18,7 @@ enum COLOR {
 
 #define BRIGHT(color) (color + 60U)
 
-class TextView : public View {
+class TextView final : public View {
 public:
     TextView();
 

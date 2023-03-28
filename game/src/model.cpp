@@ -5,8 +5,8 @@
 
 #define RABBIT_JMP_LEN  2
 #define RABBIT_CD       4 // Rabbit jump cooldown
-#define RABBIT_SENSE   20 // Distance of snake detection
-#define NEAR_DEATH      3 // Distance of rabbit perpendicular movement
+#define RABBIT_SENSE   50 // Distance of snake detection
+#define NEAR_DEATH      4 // Distance of rabbit perpendicular movement
 
 #define SNAKE_CD 1 // Snake movement cooldown
 
@@ -28,8 +28,8 @@ Model::Model(int num) {
             snake.body.push_front(coord{init_x++, init_y});
         }
 
-        for (int i = 0; i < 200; i++) {
-            rabbits.push_back(coord{rand() % 15 + 150, rand() % 10 + 40});
+        for (int i = 0; i < 600; i++) {
+            rabbits.push_back(coord{rand() % 50 + 50, rand() % 30 + 20});
         }
 
         init_y += 3;
@@ -40,18 +40,18 @@ void Model::moveCoord(coord &tgt, int dir, unsigned len) {
     switch (dir) {
         case RIGHT:
             tgt.first += len;
-            if (tgt.first >= borders.first) tgt.first = 1;
+            if (tgt.first >= borders.first - 1) tgt.first = 1;
             break;
         case LEFT:
-            if (tgt.first <= len) tgt.first = borders.first;
+            if (tgt.first <= len + 1) tgt.first = borders.first;
             tgt.first -= len;
             break;
         case DOWN:
             tgt.second += len;
-            if (tgt.second >= borders.second) tgt.second = 1;
+            if (tgt.second >= borders.second - 1) tgt.second = 1;
             break;
         case UP:
-            if (tgt.second <= len) tgt.second = borders.second;
+            if (tgt.second <= len + 1) tgt.second = borders.second;
             tgt.second -= len;
             break;
         default:
@@ -89,7 +89,7 @@ void Model::MoveRabbits() {
         unsigned dist = -1U;
 
         for (auto curr_snake = snakes.begin(); curr_snake != snakes.end(); curr_snake++) {
-            unsigned new_dist;
+            unsigned new_dist = 0;
             coord curr_closest = getClosest(*rabbit, curr_snake->body, &new_dist);
             if (new_dist < dist) {
                 dist    = new_dist;
@@ -120,6 +120,16 @@ void Model::MoveRabbits() {
 }
 
 void Model::MoveSnake(Snake& snake) {
+    if (snake.state != RUNNING) {
+        if (snake.body.size() > 2) {
+            snake.body.pop_back();
+            return;
+        } else {
+            snake.state = RUNNING;
+            return;
+        }
+    }
+
     snake.body.pop_back();
 
     coord new_head = snake.body.front();
@@ -127,7 +137,7 @@ void Model::MoveSnake(Snake& snake) {
 
     for (coord& part: snake.body) {
         if (part == new_head) {
-            state = DEAD;
+            snake.state = DEAD;
         }
     }
 
