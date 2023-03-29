@@ -4,60 +4,70 @@
 #include "model.h"
 #include <list>
 
-AIController::AIController(Snake *snake, std::list<coord> *rabbits) {
-    m = snake;
-    r = rabbits;
+AIController::AIController(Model *m, Snake *snake) {
+    _m = m;
+    _s = snake;
 }
 
 AIController::~AIController() {}
 
-static int adjustDir(Snake *snk) {
-    int dirPicked = -1;
-    coord& head = snk->body.front();
+int AIController::adjustDir() {
+    coord head = _s->body.front();
 
-    for (int cur = snk->dir; (cur + 1) % 4 != snk->dir && dirPicked < 0; cur = (cur + 1) % 4) {
-        dirPicked = cur;
+    _m->moveCoord(head, _s->dir);
 
-        coord new_head = coord_arr[cur];
-        new_head.first  += head.first;
-        new_head.second += head.second;
-
-        for (auto& part : snk->body) {
-            if (new_head == part) {
-                dirPicked = -1;
-                break;
-            }
-        }
+    if (_m->isOccupied(head) != 1) {
+        return _s->dir;
     }
 
-    return dirPicked < 0 ? snk->dir : dirPicked;
+    head = _s->body.front();
+
+    int newdir = (4 - _s->dir - 1) % 4;
+
+    _m->moveCoord(head, newdir);
+
+    if (_m->isOccupied(head) != 1) {
+        return newdir;
+    }
+    
+    newdir = (_s->dir + 1) % 4;
+
+    head = _s->body.front();
+
+    _m->moveCoord(head, newdir);
+
+    if (_m->isOccupied(head) != 1) {
+        return newdir;
+    }
+
+    return _s->dir;
 }
 
 void AIController::calculatePath() {
-    coord head = m->body.front();
-    coord closest = getClosest(head, *r);
+    coord head    = _s->body.front();
+    coord closest = getClosest(head, _m->rabbits);
 
     int xdiff = (int)closest.first  - (int)head.first;
     int ydiff = (int)closest.second - (int)head.second;
 
     if (xdiff > ydiff) {
         if (xdiff < 0) {
-            m->dir = LEFT;
+            _s->dir = LEFT;
         } else {
-            m->dir = RIGHT;
+            _s->dir = RIGHT;
         }
     }  else {
         if (ydiff < 0) {
-            m->dir = UP;
+            _s->dir = UP;
         } else {
-            m->dir = DOWN;
+            _s->dir = DOWN;
         }
     }
 
-    m->dir = adjustDir(m);
+    _s->dir = adjustDir();
 }
 
 void AIController::setSnake(Snake *snake) {
-    m = snake;
+    _s = snake;
 }
 

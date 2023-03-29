@@ -8,10 +8,12 @@
 class SnakeController {
 private:
     Snake* m;
+    const char *keys = "wsad";
 
 public:
     SnakeController();
     SnakeController(Snake *snake);
+    SnakeController(Snake *snake, const char *new_keys);
     ~SnakeController();
     
     void onKeyPressed(int key);

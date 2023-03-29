@@ -12,16 +12,16 @@ using hndlr = std::function<void ()>;
 
 enum DIRECTIONS {
     UP    = 0,
-    DOWN  = 1,
-    LEFT  = 2,
+    LEFT  = 1,
+    DOWN  = 2,
     RIGHT = 3,
 };
 
 const coord coord_arr[4] = {
-    [UP]    = { 0, -1},
-    [DOWN]  = { 0,  1},
-    [LEFT]  = {-1,  0},
-    [RIGHT] = { 1,  0}
+    { 0, -1},
+    {-1,  0},
+    { 0,  1},
+    { 1,  0},
 };
 
 enum STATES {
@@ -37,6 +37,7 @@ public:
     void onKey(int key);
     int dir = RIGHT;
     unsigned state = RUNNING;
+    int score = 0;
 };
 
 class Model {
@@ -47,6 +48,8 @@ public:
     void Update();
     std::list<Snake> snakes;
     std::list<coord> rabbits;    
+
+    int isOccupied(coord &where);
 
     void SetXY(unsigned x, unsigned y);
     void moveCoord(coord &tgt, int dir, unsigned len = 1);

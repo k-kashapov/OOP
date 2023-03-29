@@ -13,6 +13,13 @@ SnakeController::SnakeController(Snake *snake) {
     m = snake;
 }
 
+SnakeController::SnakeController(Snake *snake, const char* new_keys) {
+    View *v = View::get();
+    v->setOnKey(std::bind(&SnakeController::onKeyPressed, this, std::placeholders::_1));
+    m = snake;
+    keys = new_keys;
+}
+
 SnakeController::~SnakeController() {}
 
 void SnakeController::setSnake(Snake *snake) {
@@ -20,24 +27,17 @@ void SnakeController::setSnake(Snake *snake) {
 }
 
 void SnakeController::onKeyPressed(int key) {
-    switch (key) {
-        case 'w':
-            if ((++m->body.begin())->second >= m->body.front().second)
-                m->dir = UP;
-            break;
-        case 's':
-            if ((++m->body.begin())->second <= m->body.front().second)
-                m->dir = DOWN;
-            break;
-        case 'a':
-            if ((++m->body.begin())->first >= m->body.front().first)
-                m->dir = LEFT;
-            break;
-        case 'd':
-            if ((++m->body.begin())->first <= m->body.front().first)
-                m->dir = RIGHT;
-            break;
-        default:
-            break;
+    if (key == keys[UP]) {
+        if ((++m->body.begin())->second >= m->body.front().second)
+            m->dir = UP;
+    } else if (key == keys[DOWN]) {
+        if ((++m->body.begin())->second <= m->body.front().second)
+            m->dir = DOWN;
+    } else if (key == keys[LEFT]) {
+        if ((++m->body.begin())->first >= m->body.front().first)
+            m->dir = LEFT;
+    } else if (key == keys[RIGHT]) {
+        if ((++m->body.begin())->first <= m->body.front().first)
+            m->dir = RIGHT;
     }
 }

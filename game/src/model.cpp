@@ -28,30 +28,48 @@ Model::Model(int num) {
             snake.body.push_front(coord{init_x++, init_y});
         }
 
-        for (int i = 0; i < 600; i++) {
-            rabbits.push_back(coord{rand() % 50 + 50, rand() % 30 + 20});
-        }
-
-        init_y += 3;
+        init_y += 10;
     }
+
+    for (int i = 0; i < 600; i++) {
+        rabbits.push_back(coord{rand() % 100, rand() % 100});
+    }
+}
+
+int Model::isOccupied(coord &where) {
+    for (coord &rab : rabbits) {
+        if (rab == where) {
+            return -1;
+        }
+    }
+
+    for (auto& snk : snakes) {
+        for (coord &part : snk.body) {
+            if (part == where) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 void Model::moveCoord(coord &tgt, int dir, unsigned len) {
     switch (dir) {
         case RIGHT:
             tgt.first += len;
-            if (tgt.first >= borders.first - 1) tgt.first = 1;
+            if (tgt.first >= borders.first) tgt.first -= borders.first - 1;
             break;
         case LEFT:
-            if (tgt.first <= len + 1) tgt.first = borders.first;
+            if (tgt.first <= len) tgt.first += borders.first;
             tgt.first -= len;
             break;
         case DOWN:
             tgt.second += len;
-            if (tgt.second >= borders.second - 1) tgt.second = 1;
+            if (tgt.second >= borders.second) tgt.second -= borders.second - 1;
             break;
         case UP:
-            if (tgt.second <= len + 1) tgt.second = borders.second;
+            if (tgt.second <= len) tgt.second += borders.second;
             tgt.second -= len;
             break;
         default:
@@ -85,7 +103,7 @@ coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_r
 void Model::MoveRabbits() {
     for (auto rabbit = rabbits.begin(); rabbit != rabbits.end(); ++rabbit) {
         coord closest;
-        Snake *snake;
+        auto snake = snakes.begin();
         unsigned dist = -1U;
 
         for (auto curr_snake = snakes.begin(); curr_snake != snakes.end(); curr_snake++) {
@@ -93,25 +111,37 @@ void Model::MoveRabbits() {
             coord curr_closest = getClosest(*rabbit, curr_snake->body, &new_dist);
             if (new_dist < dist) {
                 dist    = new_dist;
-                snake   = &(*curr_snake);
+                snake   = curr_snake;
                 closest = curr_closest;
             }
         }
 
         int dir = UP;
+        int xdiff = (int)closest.first  - (int)rabbit->first;
+        int ydiff = (int)closest.second - (int)rabbit->second;
 
-        if (dist > RABBIT_SENSE * RABBIT_SENSE) {
-            dir = rand() % 4;
-        } else if (dist < NEAR_DEATH * NEAR_DEATH && dist > 0) {
-            dir = (snake->dir + 2) % 4; // Perpendicular movement
+        if (xdiff == 0 && ydiff == 0) {
+            rabbit = rabbits.erase(rabbit);
+            snake->body.push_back(snake->body.back());
+            snake->score += 100;
+            return;
+        } else if (dist > RABBIT_SENSE * RABBIT_SENSE) {
+            dir = rand() & 0xF;
+        } else if (dist < NEAR_DEATH * NEAR_DEATH) {
+            dir = (snake->dir + 1) % 4; // Perpendicular movement
         } else {
-            if      (closest.first  > rabbit->first)  dir = LEFT;
-            else if (closest.second > rabbit->second) dir = UP;
-            else if (closest.first  < rabbit->first)  dir = RIGHT;
-            else if (closest.second < rabbit->second) dir = DOWN;
-            else {
-                rabbit = rabbits.erase(rabbit);
-                snake->body.push_back(snake->body.back());
+            if (xdiff > ydiff) {
+                if (xdiff > 0) {
+                    dir = LEFT;
+                } else {
+                    dir = RIGHT;
+                }
+            } else {
+                if (ydiff < 0) {
+                    dir = DOWN;
+                } else {
+                    dir = UP;
+                }
             }
         }
 
@@ -135,9 +165,13 @@ void Model::MoveSnake(Snake& snake) {
     coord new_head = snake.body.front();
     moveCoord(new_head, snake.dir);
 
-    for (coord& part: snake.body) {
-        if (part == new_head) {
-            snake.state = DEAD;
+    for (auto& snk : snakes) {
+        for (coord& part: snk.body) {
+            if (part == new_head) {
+                snake.state = DEAD;
+                snake.body.push_front(new_head);
+                return;
+            }
         }
     }
 

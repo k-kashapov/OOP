@@ -7,11 +7,12 @@
 
 class AIController {
 private:
-    Snake* m;
-    std::list<coord> *r;
+    Model* _m;
+    Snake* _s;
+    int adjustDir();
 
 public:
-    AIController(Snake *snake, std::list<coord> *rabbits);
+    AIController(Model *m, Snake *snake);
     ~AIController();
     
     void setSnake(Snake *model);

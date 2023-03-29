@@ -98,6 +98,7 @@ void TextView::hline(unsigned x, unsigned y, unsigned len) {
 
 void TextView::setModel(Model* model) {
     _model = model;
+    WinXY();
     _model->SetXY(_x, _y);
 }
 
@@ -214,15 +215,29 @@ void TextView::loop() {
                 break;
             }
         }
-        
+
         char key = (char)getKey();
 
         if (key > 0) {
             callOnKey(key);
         }
 
-        if (key == 'q') finish = true;
+        if (key == 'q')                  finish = true;
+        if (_model->rabbits.size() == 1) finish = true;
 
         draw();
     }
+
+    setCaret(_x / 2 - 30, _y / 2);
+
+    std::cout << "FINISH! Scores: ";
+
+    auto begin = _model->snakes.begin();
+    for (unsigned long i = 0; i < _model->snakes.size(); i++) {
+        printf("%lu: %d, ", i, (begin++)->score);
+    }
+
+    std::cout << " Press enter to exit!   " << std::endl;
+
+    fflush(stdout);
 }
