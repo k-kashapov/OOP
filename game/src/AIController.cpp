@@ -5,83 +5,77 @@
 #include <list>
 #include <iostream>
 
-AIController::AIController(Model *m, Snake *snake) {
+AIController::AIController(Model *m, Snake *snake, int num) {
     _m = m;
     _s = snake;
+    number = num;
 }
 
 AIController::~AIController() {}
 
-int AIController::adjustDir() {
-    coord head = _s->body.front();
+int AIController::adjustDir(coord pos, unsigned cur_dist, int recur) {
+    // std::cerr << "snake num " << number << "\n";
 
-    // std::cerr << "dir = " << _s->dir << std::endl;
+    unsigned found_dist = cur_dist;
+    int      picked_dir = -1;
+    coord    head       = pos;
 
-    coord newhead = _m->moveCoord(head, _s->dir);
+    int checked_dir = _s->dir;
+    coord newhead   = _m->moveCoord(head, checked_dir);
 
-    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
+    // std::cerr << "checking dir = " << checked_dir << "; newhead = (" << newhead.first << ", " << newhead.second << ")\n";
 
-    if (_m->isOccupied(newhead) != 1) {
-        return _s->dir;
+    if (_m->isOccupied(newhead, 0, &head) != 1) {
+        _m->getClosest(newhead, _m->rabbits, &found_dist);
+        if (found_dist <= cur_dist) {
+            picked_dir = checked_dir;
+            cur_dist   = found_dist;
+            // std::cerr << "found dir = " << picked_dir << "; dist = " << cur_dist << "\n";
+        }
     }
 
-    unsigned newdir = ((unsigned)_s->dir + 1) % 4;
+    checked_dir = (int)(((unsigned)checked_dir + 1) % 4);
+    newhead = _m->moveCoord(head, checked_dir);
 
-    // std::cerr << "newdir = " << newdir << std::endl;
-    newhead = _m->moveCoord(head, (int)newdir);
-    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
+    // std::cerr << "checking dir = " << checked_dir << "; newhead = (" << newhead.first << ", " << newhead.second << ")\n";
 
-    if (_m->isOccupied(newhead) != 1) {
-        return (int)newdir;
+    if (_m->isOccupied(newhead, 0, &head) != 1) {
+        _m->getClosest(newhead, _m->rabbits, &found_dist);
+        if (found_dist < cur_dist) {
+            picked_dir = checked_dir;
+            cur_dist   = found_dist;
+            // std::cerr << "found dir = " << picked_dir << "; dist = " << cur_dist << "\n";
+        }
     }
 
-    newdir = ((unsigned)_s->dir - 1) % 4;
+    checked_dir = (int)(((unsigned)checked_dir + 2) % 4);
+    newhead = _m->moveCoord(head, checked_dir);
 
-    // std::cerr << "newdir = " << newdir << std::endl;
-    newhead = _m->moveCoord(head, (int)newdir);
-    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
+    // std::cerr << "checking dir = " << checked_dir << "; newhead = (" << newhead.first << ", " << newhead.second << ")\n";
 
-    if (_m->isOccupied(newhead) != 1) {
-        return (int)newdir;
+    if (_m->isOccupied(newhead, 0, &head) != 1) {
+        _m->getClosest(newhead, _m->rabbits, &found_dist);
+        if (found_dist < cur_dist) {
+            picked_dir = checked_dir;
+            cur_dist   = found_dist;
+            // std::cerr << "found dir = " << picked_dir << "; dist = " << cur_dist << "\n";
+        }
     }
 
-    newdir = ((unsigned)_s->dir + 2) % 4;
+    // std::cerr << "returning: " << picked_dir << "\n";
 
-    // std::cerr << "newdir = " << newdir << std::endl;
-    newhead = _m->moveCoord(head, (int)newdir);
-    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
-
-    if (_m->isOccupied(newhead) != 1) {
-        return (int)newdir;
-    }
-
-    // std::cerr << "ded\n";
-
-    return _s->dir;
+    return picked_dir;
 }
 
 void AIController::calculatePath() {
-    coord head    = _s->body.front();
-    coord closest = _m->getClosest(head, _m->rabbits);
-
-    int xdiff = (int)closest.first  - (int)head.first;
-    int ydiff = (int)closest.second - (int)head.second;
-
-    if (xdiff > ydiff) {
-        if (xdiff < 0) {
-            _s->dir = LEFT;
-        } else {
-            _s->dir = RIGHT;
-        }
-    }  else {
-        if (ydiff < 0) {
-            _s->dir = UP;
-        } else {
-            _s->dir = DOWN;
-        }
+    if (_s->state != RUNNING) return;
+    coord    head     = _s->body.front();
+    
+    _m->getClosest(head, _m->rabbits);
+    int newdir = adjustDir(head, -1U, 1);
+    if (newdir >= 0) {
+        _s->dir = newdir;
     }
-
-    _s->dir = adjustDir();
 }
 
 void AIController::setSnake(Snake *snake) {

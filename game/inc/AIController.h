@@ -9,10 +9,11 @@ class AIController {
 private:
     Model* _m;
     Snake* _s;
-    int adjustDir();
+    int number = 0;
+    int adjustDir(coord pos, unsigned cur_dist, int recur);
 
 public:
-    AIController(Model *m, Snake *snake);
+    AIController(Model *m, Snake *snake, int num);
     ~AIController();
     
     void setSnake(Snake *model);

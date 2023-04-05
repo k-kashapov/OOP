@@ -4,7 +4,7 @@
 #include "model.h"
 
 #define RABBIT_JMP_LEN  2
-#define RABBIT_CD       4 // Rabbit jump cooldown
+#define RABBIT_CD       8 // Rabbit jump cooldown
 #define RABBIT_SENSE   60 // Distance of snake detection
 #define NEAR_DEATH      4 // Distance of rabbit perpendicular movement
 
@@ -19,12 +19,11 @@ Model::Model(int num) {
         snakes.push_back(Snake());
     }
 
-    unsigned init_y = 5;
-
     for (auto& snake : snakes) {
         snake.dir = RIGHT;
 
-        unsigned init_x = 5;
+        unsigned init_x = (unsigned)rand() % 80;
+        unsigned init_y = (unsigned)rand() % 40;
 
         for (int i = 0; i < 7; i++) {
             snake.body.push_front(coord{init_x++, init_y});
@@ -42,29 +41,35 @@ void Model::addRabbit() {
     rabbits.push_back(coord{(unsigned)rand() % borders.first, (unsigned)rand() % borders.second});
 }
 
-int Model::isOccupied(coord &where, bool check_rab) {
+int Model::isOccupied(coord &where, bool check_rab, coord* myhead) {
     for (auto& snk : snakes) {
         for (coord &part : snk.body) {
-            std::cerr << "checking (" << part.first << ", " << part.second << ")\n";
+            // std::cerr << "checking (" << part.first << ", " << part.second << ")\n";
 
             if (part.first == where.first && part.second == where.second) {
-                std::cerr << "isOccupied snake\n";
+                // std::cerr << "isOccupied snake\n";
                 return 1;
             }
+        }
+
+        coord head = snk.body.front();
+        if (head != *myhead) {
+            head = moveCoord(head, snk.dir);
+            if (head == where) return 1;
         }
     }
 
     if (check_rab) {
         for (coord &rab : rabbits) {
-            std::cerr << "checking rabbit (" << rab.first << ", " << rab.second << ")\n";
+            // std::cerr << "checking rabbit (" << rab.first << ", " << rab.second << ")\n";
             if (rab.first == where.first && rab.second == where.second) {
-                std::cerr << "isOccupied rabbit\n";
+                // std::cerr << "isOccupied rabbit\n";
                 return -1;
             }
         }
     }
 
-    std::cerr << "notOccupied\n";
+    // std::cerr << "notOccupied\n";
     return 0;
 }
 
@@ -95,9 +100,9 @@ coord Model::moveCoord(coord tgt, int dir, unsigned len) {
 }
 
 unsigned Model::euclDistSqr(const coord& a, const coord& b) {
-    unsigned diff_x = a.first % borders.first - b.first % borders.first;
-    unsigned diff_y = a.second % borders.second - b.second % borders.second;
-    return diff_x * diff_x + diff_y * diff_y;
+    int diff_x = (int)(a.first % borders.first) - (int)(b.first % borders.first);
+    int diff_y = (int)(a.second % borders.second) - (int)(b.second % borders.second);
+    return (unsigned)(abs(diff_x) + abs(diff_y));
 }
 
 coord Model::getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res) {
@@ -106,7 +111,7 @@ coord Model::getClosest(const coord &from, const std::list<coord>& to, unsigned 
 
     for (auto& iter : to) {
         unsigned new_dist = euclDistSqr(from, iter);
-        if (new_dist < dist) {
+        if (new_dist <= dist) {
             dist = new_dist;
             res = iter;
             if (dist_res) {
@@ -139,12 +144,9 @@ void Model::MoveRabbits() {
         int ydiff = (int)closest.second - (int)rabbit->second;
 
         if (xdiff == 0 && ydiff == 0) {
-            rabbit = rabbits.erase(rabbit);
-            snake->body.push_back(snake->body.back());
-            snake->score += 100;
             return;
         } else if (dist > RABBIT_SENSE * RABBIT_SENSE) {
-            dir = rand() % 0x4;
+            return;
         } else if (dist < NEAR_DEATH * NEAR_DEATH) {
             dir = (snake->dir + 1) % 4; // Perpendicular movement
         } else {
@@ -188,6 +190,17 @@ void Model::MoveSnake(Snake& snake) {
     }
 
     snake.body.push_front(new_head);
+    
+    for (auto r = rabbits.begin(); r != rabbits.end(); r++) {
+        unsigned dist = euclDistSqr(new_head, *r);        
+
+        if (dist == 0) {
+            rabbits.erase(r);
+            snake.body.push_back(snake.body.back());
+            snake.score += 100;
+            return;
+        }
+    }
 }
 
 void Model::SetXY(unsigned x, unsigned y) {
