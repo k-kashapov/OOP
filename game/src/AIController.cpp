@@ -3,6 +3,7 @@
 #include "view.h"
 #include "model.h"
 #include <list>
+#include <iostream>
 
 AIController::AIController(Model *m, Snake *snake) {
     _m = m;
@@ -14,38 +15,54 @@ AIController::~AIController() {}
 int AIController::adjustDir() {
     coord head = _s->body.front();
 
-    _m->moveCoord(head, _s->dir);
+    // std::cerr << "dir = " << _s->dir << std::endl;
 
-    if (_m->isOccupied(head) != 1) {
+    coord newhead = _m->moveCoord(head, _s->dir);
+
+    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
+
+    if (_m->isOccupied(newhead) != 1) {
         return _s->dir;
     }
 
-    head = _s->body.front();
+    unsigned newdir = ((unsigned)_s->dir + 1) % 4;
 
-    int newdir = (4 - _s->dir - 1) % 4;
+    // std::cerr << "newdir = " << newdir << std::endl;
+    newhead = _m->moveCoord(head, (int)newdir);
+    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
 
-    _m->moveCoord(head, newdir);
-
-    if (_m->isOccupied(head) != 1) {
-        return newdir;
+    if (_m->isOccupied(newhead) != 1) {
+        return (int)newdir;
     }
-    
-    newdir = (_s->dir + 1) % 4;
 
-    head = _s->body.front();
+    newdir = ((unsigned)_s->dir - 1) % 4;
 
-    _m->moveCoord(head, newdir);
+    // std::cerr << "newdir = " << newdir << std::endl;
+    newhead = _m->moveCoord(head, (int)newdir);
+    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
 
-    if (_m->isOccupied(head) != 1) {
-        return newdir;
+    if (_m->isOccupied(newhead) != 1) {
+        return (int)newdir;
     }
+
+    newdir = ((unsigned)_s->dir + 2) % 4;
+
+    // std::cerr << "newdir = " << newdir << std::endl;
+    newhead = _m->moveCoord(head, (int)newdir);
+    // std::cerr << "newhead = (" << newhead.first << ", " << newhead.second << ")" << std::endl;
+
+    if (_m->isOccupied(newhead) != 1) {
+        return (int)newdir;
+    }
+
+    // std::cerr << "ded\n";
 
     return _s->dir;
 }
 
 void AIController::calculatePath() {
     coord head    = _s->body.front();
-    coord closest = getClosest(head, _m->rabbits);
+    coord closest = _m->getClosest(head, _m->rabbits);
 
     int xdiff = (int)closest.first  - (int)head.first;
     int ydiff = (int)closest.second - (int)head.second;

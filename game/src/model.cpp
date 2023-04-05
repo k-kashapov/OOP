@@ -5,10 +5,12 @@
 
 #define RABBIT_JMP_LEN  2
 #define RABBIT_CD       4 // Rabbit jump cooldown
-#define RABBIT_SENSE   50 // Distance of snake detection
+#define RABBIT_SENSE   60 // Distance of snake detection
 #define NEAR_DEATH      4 // Distance of rabbit perpendicular movement
 
-#define SNAKE_CD 1 // Snake movement cooldown
+#define SNAKE_CD 1  // Snake movement cooldown
+
+#define RABBIT_RESPAWN_CD 10
 
 Model::Model(int num) {
     std::srand((unsigned)std::time(NULL));
@@ -28,33 +30,45 @@ Model::Model(int num) {
             snake.body.push_front(coord{init_x++, init_y});
         }
 
-        init_y += 10;
+        init_y += 5;
     }
 
-    for (int i = 0; i < 600; i++) {
+    for (int i = 0; i < 15; i++) {
         rabbits.push_back(coord{rand() % 100, rand() % 100});
     }
 }
 
-int Model::isOccupied(coord &where) {
-    for (coord &rab : rabbits) {
-        if (rab == where) {
-            return -1;
-        }
-    }
+void Model::addRabbit() {
+    rabbits.push_back(coord{(unsigned)rand() % borders.first, (unsigned)rand() % borders.second});
+}
 
+int Model::isOccupied(coord &where, bool check_rab) {
     for (auto& snk : snakes) {
         for (coord &part : snk.body) {
-            if (part == where) {
+            std::cerr << "checking (" << part.first << ", " << part.second << ")\n";
+
+            if (part.first == where.first && part.second == where.second) {
+                std::cerr << "isOccupied snake\n";
                 return 1;
             }
         }
     }
 
+    if (check_rab) {
+        for (coord &rab : rabbits) {
+            std::cerr << "checking rabbit (" << rab.first << ", " << rab.second << ")\n";
+            if (rab.first == where.first && rab.second == where.second) {
+                std::cerr << "isOccupied rabbit\n";
+                return -1;
+            }
+        }
+    }
+
+    std::cerr << "notOccupied\n";
     return 0;
 }
 
-void Model::moveCoord(coord &tgt, int dir, unsigned len) {
+coord Model::moveCoord(coord tgt, int dir, unsigned len) {
     switch (dir) {
         case RIGHT:
             tgt.first += len;
@@ -76,13 +90,17 @@ void Model::moveCoord(coord &tgt, int dir, unsigned len) {
             std::cerr << "Unexpected direction: " << dir << std::endl;
             break;
     }
+
+    return tgt;
 }
 
-static unsigned euclDistSqr(const coord& a, const coord& b) {
-    return (a.first - b.first)  * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+unsigned Model::euclDistSqr(const coord& a, const coord& b) {
+    unsigned diff_x = a.first % borders.first - b.first % borders.first;
+    unsigned diff_y = a.second % borders.second - b.second % borders.second;
+    return diff_x * diff_x + diff_y * diff_y;
 }
 
-coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res) {
+coord Model::getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res) {
     unsigned dist = -1U;
     coord res = to.front();
 
@@ -126,7 +144,7 @@ void Model::MoveRabbits() {
             snake->score += 100;
             return;
         } else if (dist > RABBIT_SENSE * RABBIT_SENSE) {
-            dir = rand() & 0xF;
+            dir = rand() % 0x4;
         } else if (dist < NEAR_DEATH * NEAR_DEATH) {
             dir = (snake->dir + 1) % 4; // Perpendicular movement
         } else {
@@ -145,25 +163,19 @@ void Model::MoveRabbits() {
             }
         }
 
-        moveCoord(*rabbit, dir, RABBIT_JMP_LEN);
+        *rabbit = moveCoord(*rabbit, dir, RABBIT_JMP_LEN);
     }
 }
 
 void Model::MoveSnake(Snake& snake) {
     if (snake.state != RUNNING) {
-        if (snake.body.size() > 2) {
-            snake.body.pop_back();
-            return;
-        } else {
-            snake.state = RUNNING;
-            return;
-        }
+        return;
     }
 
     snake.body.pop_back();
 
     coord new_head = snake.body.front();
-    moveCoord(new_head, snake.dir);
+    new_head = moveCoord(new_head, snake.dir);
 
     for (auto& snk : snakes) {
         for (coord& part: snk.body) {
@@ -194,5 +206,9 @@ void Model::Update() {
 
     if (!(frames % RABBIT_CD)) {
         MoveRabbits();
+    }
+
+    if (!(frames % RABBIT_RESPAWN_CD)) {
+        addRabbit();
     }
 }

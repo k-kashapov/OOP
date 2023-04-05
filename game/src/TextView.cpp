@@ -223,7 +223,7 @@ void TextView::loop() {
         }
 
         if (key == 'q')                  finish = true;
-        if (_model->rabbits.size() == 1) finish = true;
+        if (_model->rabbits.size() == 0) finish = true;
 
         draw();
     }

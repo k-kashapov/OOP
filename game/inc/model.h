@@ -17,7 +17,7 @@ enum DIRECTIONS {
     RIGHT = 3,
 };
 
-const coord coord_arr[4] = {
+static const coord coord_arr[4] = {
     { 0, -1},
     {-1,  0},
     { 0,  1},
@@ -49,18 +49,22 @@ public:
     std::list<Snake> snakes;
     std::list<coord> rabbits;    
 
-    int isOccupied(coord &where);
+    int isOccupied(coord &where, bool check_rab = false);
 
     void SetXY(unsigned x, unsigned y);
-    void moveCoord(coord &tgt, int dir, unsigned len = 1);
+    coord moveCoord(coord tgt, int dir, unsigned len = 1);
+    coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);
 
 private:
-    coord borders;
+    coord borders{50, 50};
 
+    unsigned euclDistSqr(const coord& a, const coord& b);
+
+    void addRabbit();
     void MoveRabbits();
     void MoveSnake(Snake &snake);
 };
 
-coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);
+// coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);
 
 #endif // MODEL_H
