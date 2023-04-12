@@ -99,10 +99,16 @@ coord Model::moveCoord(coord tgt, int dir, unsigned len) {
     return tgt;
 }
 
-unsigned Model::euclDistSqr(const coord& a, const coord& b) {
+unsigned Model::ManhatanDist(const coord& a, const coord& b) {
     int diff_x = (int)(a.first % borders.first) - (int)(b.first % borders.first);
     int diff_y = (int)(a.second % borders.second) - (int)(b.second % borders.second);
     return (unsigned)(abs(diff_x) + abs(diff_y));
+}
+
+unsigned Model::euclDistSqr(const coord& a, const coord& b) {
+    int diff_x = (int)(a.first % borders.first) - (int)(b.first % borders.first);
+    int diff_y = (int)(a.second % borders.second) - (int)(b.second % borders.second);
+    return (unsigned)((diff_x * diff_x) + (diff_y * diff_y));
 }
 
 coord Model::getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res) {
@@ -110,7 +116,7 @@ coord Model::getClosest(const coord &from, const std::list<coord>& to, unsigned 
     coord res = to.front();
 
     for (auto& iter : to) {
-        unsigned new_dist = euclDistSqr(from, iter);
+        unsigned new_dist = ManhatanDist(from, iter);
         if (new_dist <= dist) {
             dist = new_dist;
             res = iter;
@@ -192,7 +198,7 @@ void Model::MoveSnake(Snake& snake) {
     snake.body.push_front(new_head);
     
     for (auto r = rabbits.begin(); r != rabbits.end(); r++) {
-        unsigned dist = euclDistSqr(new_head, *r);        
+        unsigned dist = ManhatanDist(new_head, *r);        
 
         if (dist == 0) {
             rabbits.erase(r);

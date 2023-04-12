@@ -70,7 +70,7 @@ void GUIView::loop(void) {
 void GUIView::subTimer(const long interval, hndlr func) {
     (void) interval;
     (void) func;
-    std::cout << "GUIView(" << _x << ", " << _y << ") clear called\n";
+    // std::cout << "GUIView(" << _x << ", " << _y << ") clear called\n";
 }
 
 inline void GUIView::clear(void) {

@@ -236,7 +236,7 @@ void TextView::loop() {
         printf("%lu: %d, ", i, (begin++)->score);
     }
 
-    std::cout << " Press enter to exit!   " << std::endl;
+    std::cout << "\n\rPress enter to exit!" << std::endl;
 
     fflush(stdout);
 }

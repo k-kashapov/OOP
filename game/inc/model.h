@@ -54,6 +54,7 @@ public:
     void SetXY(unsigned x, unsigned y);
     coord moveCoord(coord tgt, int dir, unsigned len = 1);
     coord getClosest(const coord &from, const std::list<coord>& to, unsigned *dist_res = NULL);
+    unsigned ManhatanDist(const coord& a, const coord& b);
     unsigned euclDistSqr(const coord& a, const coord& b);
 
 private:
